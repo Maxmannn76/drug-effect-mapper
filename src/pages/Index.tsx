@@ -9,7 +9,8 @@ import { ChatBot } from "@/components/ChatBot";
 import { useApiConnection } from "@/hooks/useApiConnection";
 import { Drug, NetworkData, DrugSimilarity } from "@/types/drug";
 import { mockDrugs, generateNetworkData, getSimilarDrugs, getDrugById } from "@/data/mockData";
-import { Dna, Share2 } from "lucide-react";
+import { Share2 } from "lucide-react";
+import elixLogo from "@/assets/elix-logo.png";
 
 const Index = () => {
   const [threshold, setThreshold] = useState(0.5);
@@ -110,14 +111,8 @@ const Index = () => {
           {/* Header */}
           <header className="space-y-2 animate-fade-in">
             <div className="flex items-center gap-4">
-              {/* Stylized DrugDruid Logo */}
-              <div className="flex items-center">
-                <span className="text-7xl md:text-8xl font-bold text-gradient-primary leading-none">D</span>
-                <div className="flex flex-col -ml-1 leading-none -space-y-1">
-                  <span className="text-2xl md:text-3xl font-bold text-gradient-primary">rug</span>
-                  <span className="text-2xl md:text-3xl font-bold text-gradient-primary">ruid</span>
-                </div>
-              </div>
+              {/* ELIX Logo */}
+              <img src={elixLogo} alt="ELIX" className="h-16 md:h-20 w-auto" />
               <div className="hidden sm:block h-10 w-px bg-border/50" />
               <p className="hidden sm:block text-sm text-muted-foreground max-w-xs">
                 Find drugs with similar cellular responses
