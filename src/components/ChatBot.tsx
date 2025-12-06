@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -6,6 +6,36 @@ import { Send, Bot, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Drug, DrugSimilarity } from "@/types/drug";
+
+// Simple markdown parser for chat messages
+function parseMarkdown(text: string): React.ReactNode {
+  // Split by code blocks first
+  const parts = text.split(/(`[^`]+`)/g);
+  
+  return parts.map((part, index) => {
+    // Inline code
+    if (part.startsWith("`") && part.endsWith("`")) {
+      return (
+        <code key={index} className="bg-secondary/50 px-1 py-0.5 rounded text-xs font-mono">
+          {part.slice(1, -1)}
+        </code>
+      );
+    }
+    
+    // Process other markdown
+    let processed: React.ReactNode = part;
+    
+    // Bold **text**
+    const boldParts = part.split(/\*\*([^*]+)\*\*/g);
+    if (boldParts.length > 1) {
+      processed = boldParts.map((segment, i) => 
+        i % 2 === 1 ? <strong key={i}>{segment}</strong> : segment
+      );
+    }
+    
+    return <span key={index}>{processed}</span>;
+  });
+}
 
 interface Message {
   id: string;
@@ -285,7 +315,7 @@ export const ChatBot = ({ selectedDrug, similarDrugs, allDrugs, threshold }: Cha
                     : "bg-muted/50 text-foreground"
                 }`}
               >
-                {message.content}
+                {parseMarkdown(message.content)}
               </div>
             </div>
           ))}
