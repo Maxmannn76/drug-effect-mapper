@@ -1,8 +1,9 @@
 export interface Drug {
   id: string;
-  name: string;
-  mechanism?: string;
-  cellTypes?: string[];
+  drug: string;  // drug name from Qdrant
+  cell_line: string;  // single cell line (e.g., "CVCL_0023")
+  samples_aggregated?: number;
+  mechanism?: string;  // optional, may come from external source
 }
 
 export interface DrugSimilarity {
@@ -12,7 +13,8 @@ export interface DrugSimilarity {
 
 export interface NetworkNode {
   id: string;
-  name: string;
+  drug: string;  // drug name
+  cell_line: string;
   x?: number;
   y?: number;
   size?: number;

@@ -289,7 +289,7 @@ export function NetworkGraph({
                       isSelected ? "fill-primary font-semibold" : "fill-foreground"
                     )}
                   >
-                    {node.name}
+                    {node.drug}
                   </text>
                 </g>
               );

@@ -20,7 +20,7 @@ export function DrugSearch({ drugs, selectedDrug, onSelectDrug }: DrugSearchProp
     const lowerQuery = query.toLowerCase();
     return drugs.filter(
       (drug) =>
-        drug.name.toLowerCase().includes(lowerQuery) ||
+        drug.drug.toLowerCase().includes(lowerQuery) ||
         drug.mechanism?.toLowerCase().includes(lowerQuery)
     );
   }, [drugs, query]);
@@ -42,7 +42,7 @@ export function DrugSearch({ drugs, selectedDrug, onSelectDrug }: DrugSearchProp
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           placeholder="Search drugs by name or mechanism..."
-          value={selectedDrug ? selectedDrug.name : query}
+          value={selectedDrug ? selectedDrug.drug : query}
           onChange={(e) => {
             if (selectedDrug) {
               onSelectDrug(null);
@@ -76,7 +76,7 @@ export function DrugSearch({ drugs, selectedDrug, onSelectDrug }: DrugSearchProp
                 "flex flex-col gap-0.5"
               )}
             >
-              <span className="font-medium text-foreground">{drug.name}</span>
+              <span className="font-medium text-foreground">{drug.drug}</span>
               {drug.mechanism && (
                 <span className="text-xs text-muted-foreground">{drug.mechanism}</span>
               )}
