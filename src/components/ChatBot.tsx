@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Send, Bot, User } from "lucide-react";
+import { toast } from "sonner";
 
 interface Message {
   id: string;
@@ -10,6 +11,8 @@ interface Message {
   content: string;
   timestamp: Date;
 }
+
+const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/drug-chat`;
 
 export const ChatBot = () => {
   const [messages, setMessages] = useState<Message[]>([
@@ -40,21 +43,104 @@ export const ChatBot = () => {
       timestamp: new Date(),
     };
 
-    setMessages((prev) => [...prev, userMessage]);
+    const chatMessages = [...messages, userMessage].map(m => ({
+      role: m.role,
+      content: m.content
+    }));
+
+    setMessages(prev => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
 
-    // Simulate AI response (replace with actual API call)
-    setTimeout(() => {
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content: `I understand you're asking about "${userMessage.content}". This is a placeholder response. Connect to your AI backend to get real insights about drug similarities and repurposing opportunities.`,
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, assistantMessage]);
+    let assistantContent = "";
+
+    try {
+      const response = await fetch(CHAT_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ messages: chatMessages }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Error: ${response.status}`);
+      }
+
+      if (!response.body) {
+        throw new Error("No response body");
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let textBuffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        textBuffer += decoder.decode(value, { stream: true });
+
+        let newlineIndex: number;
+        while ((newlineIndex = textBuffer.indexOf("\n")) !== -1) {
+          let line = textBuffer.slice(0, newlineIndex);
+          textBuffer = textBuffer.slice(newlineIndex + 1);
+
+          if (line.endsWith("\r")) line = line.slice(0, -1);
+          if (line.startsWith(":") || line.trim() === "") continue;
+          if (!line.startsWith("data: ")) continue;
+
+          const jsonStr = line.slice(6).trim();
+          if (jsonStr === "[DONE]") break;
+
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const content = parsed.choices?.[0]?.delta?.content as string | undefined;
+            if (content) {
+              assistantContent += content;
+              setMessages(prev => {
+                const last = prev[prev.length - 1];
+                if (last?.role === "assistant" && last.id.startsWith("stream-")) {
+                  return prev.map((m, i) =>
+                    i === prev.length - 1 ? { ...m, content: assistantContent } : m
+                  );
+                }
+                return [
+                  ...prev,
+                  {
+                    id: `stream-${Date.now()}`,
+                    role: "assistant",
+                    content: assistantContent,
+                    timestamp: new Date(),
+                  },
+                ];
+              });
+            }
+          } catch {
+            textBuffer = line + "\n" + textBuffer;
+            break;
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Chat error:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to get response");
+      
+      if (!assistantContent) {
+        setMessages(prev => [
+          ...prev,
+          {
+            id: `error-${Date.now()}`,
+            role: "assistant",
+            content: "Sorry, I encountered an error. Please try again.",
+            timestamp: new Date(),
+          },
+        ]);
+      }
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -113,7 +199,7 @@ export const ChatBot = () => {
               </div>
             </div>
           ))}
-          {isLoading && (
+          {isLoading && !messages.some(m => m.id.startsWith("stream-")) && (
             <div className="flex gap-3">
               <div className="w-7 h-7 rounded-full bg-accent/20 flex items-center justify-center">
                 <Bot className="h-3.5 w-3.5 text-accent" />
