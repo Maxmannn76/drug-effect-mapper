@@ -109,18 +109,19 @@ const Index = () => {
         <div className="max-w-[1200px] mx-auto space-y-6">
           {/* Header */}
           <header className="space-y-2 animate-fade-in">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                <Dna className="h-5 w-5 text-primary-foreground" />
+            <div className="flex items-center gap-4">
+              {/* Stylized DrugDruid Logo */}
+              <div className="flex items-center">
+                <span className="text-5xl md:text-6xl font-bold text-gradient-primary leading-none">D</span>
+                <div className="flex flex-col -ml-0.5 leading-tight">
+                  <span className="text-xl md:text-2xl font-bold text-gradient-primary">rug</span>
+                  <span className="text-xl md:text-2xl font-bold text-gradient-primary">ruid</span>
+                </div>
               </div>
-              <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-gradient-primary">
-                  Drug Repurposing Engine
-                </h1>
-                <p className="text-sm text-muted-foreground">
-                  Discover drugs with similar cellular responses via Tahoe-x1 embeddings
-                </p>
-              </div>
+              <div className="hidden sm:block h-10 w-px bg-border/50" />
+              <p className="hidden sm:block text-sm text-muted-foreground max-w-xs">
+                Discover drugs with similar cellular responses via Tahoe-x1 embeddings
+              </p>
             </div>
           </header>
 
