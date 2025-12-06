@@ -1,6 +1,8 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { NetworkData, Drug, DrugSimilarity } from "@/types/drug";
 import { mockDrugs, generateNetworkData, getSimilarDrugs } from "@/data/mockData";
+
+const DEFAULT_API_URL = "http://127.0.0.1:8000";
 
 interface ApiState {
   isConnected: boolean;
@@ -12,7 +14,7 @@ interface ApiState {
 export function useApiConnection() {
   const [state, setState] = useState<ApiState>({
     isConnected: false,
-    isLoading: false,
+    isLoading: true, // Start loading while attempting auto-connect
     error: null,
     baseUrl: null,
   });
@@ -42,6 +44,11 @@ export function useApiConnection() {
   // Disconnect from API (fall back to mock data)
   const disconnect = useCallback(() => {
     setState({ isConnected: false, isLoading: false, error: null, baseUrl: null });
+  }, []);
+
+  // Auto-connect on mount
+  useEffect(() => {
+    connect(DEFAULT_API_URL);
   }, []);
 
   // Fetch network data
