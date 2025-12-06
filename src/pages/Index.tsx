@@ -60,7 +60,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row">
+    <div className="h-screen flex flex-col md:flex-row overflow-hidden">
       {/* Main Dashboard */}
       <div className="flex-1 p-4 md:p-6 lg:p-8 overflow-auto">
         <div className="max-w-[1200px] mx-auto space-y-6">
@@ -136,9 +136,9 @@ const Index = () => {
       </div>
 
       {/* Right Column - Drug Details + Chatbot */}
-      <div className="w-full md:w-1/4 md:min-w-[300px] md:max-w-[420px] h-[600px] md:h-auto border-t md:border-t-0 md:border-l border-border/50 bg-card/30 flex flex-col">
+      <div className="w-full md:w-1/4 md:min-w-[300px] md:max-w-[420px] md:h-full border-t md:border-t-0 md:border-l border-border/50 bg-card/30 flex flex-col overflow-hidden">
         {/* Top: Drug Details */}
-        <div className="flex-shrink-0 p-4 border-b border-border/50 overflow-auto max-h-[45%]">
+        <div className="shrink-0 p-4 border-b border-border/50 overflow-auto max-h-[40%]">
           {selectedDrug ? (
             <DrugDetailsPanel
               drug={selectedDrug}
@@ -153,7 +153,7 @@ const Index = () => {
         </div>
         
         {/* Bottom: Chatbot */}
-        <div className="flex-1 p-4 min-h-0">
+        <div className="flex-1 p-4 min-h-0 overflow-hidden">
           <ChatBot />
         </div>
       </div>
