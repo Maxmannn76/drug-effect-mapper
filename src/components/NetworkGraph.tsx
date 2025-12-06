@@ -26,29 +26,32 @@ export function NetworkGraph({
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
+  const nodes = data?.nodes ?? [];
+  const edges = data?.edges ?? [];
+
   // Calculate connected nodes and their similarities when a node is selected
   const { connectedEdges, similarityMap } = useMemo(() => {
-    const edges: { nodeId: string; similarity: number }[] = [];
+    const result: { nodeId: string; similarity: number }[] = [];
     const map = new Map<string, number>();
 
-    if (!selectedNodeId) return { connectedEdges: edges, similarityMap: map };
+    if (!selectedNodeId) return { connectedEdges: result, similarityMap: map };
 
-    data.edges.forEach((edge) => {
+    edges.forEach((edge) => {
       if (edge.source === selectedNodeId) {
-        edges.push({ nodeId: edge.target, similarity: edge.similarity });
+        result.push({ nodeId: edge.target, similarity: edge.similarity });
         map.set(edge.target, edge.similarity);
       }
       if (edge.target === selectedNodeId) {
-        edges.push({ nodeId: edge.source, similarity: edge.similarity });
+        result.push({ nodeId: edge.source, similarity: edge.similarity });
         map.set(edge.source, edge.similarity);
       }
     });
 
     // Sort by similarity descending
-    edges.sort((a, b) => b.similarity - a.similarity);
+    result.sort((a, b) => b.similarity - a.similarity);
 
-    return { connectedEdges: edges, similarityMap: map };
-  }, [selectedNodeId, data.edges]);
+    return { connectedEdges: result, similarityMap: map };
+  }, [selectedNodeId, edges]);
 
   // Calculate positions: selected node in center, connected nodes arranged by similarity
   const nodePositions = useMemo(() => {
@@ -56,7 +59,7 @@ export function NetworkGraph({
 
     if (!selectedNodeId) {
       // No selection: use original positions
-      data.nodes.forEach((node) => {
+      nodes.forEach((node) => {
         positions.set(node.id, { x: node.x || 0, y: node.y || 0 });
       });
       return positions;
@@ -77,26 +80,26 @@ export function NetworkGraph({
     });
 
     return positions;
-  }, [selectedNodeId, connectedEdges, data.nodes]);
+  }, [selectedNodeId, connectedEdges, nodes]);
 
   // Filter nodes to show only selected + connected when a drug is selected
   const visibleNodes = useMemo(() => {
-    if (!selectedNodeId) return data.nodes;
+    if (!selectedNodeId) return nodes;
     
     const connectedIds = new Set(connectedEdges.map((e) => e.nodeId));
     connectedIds.add(selectedNodeId);
     
-    return data.nodes.filter((node) => connectedIds.has(node.id));
-  }, [selectedNodeId, connectedEdges, data.nodes]);
+    return nodes.filter((node) => connectedIds.has(node.id));
+  }, [selectedNodeId, connectedEdges, nodes]);
 
   // Filter edges to show only those connected to selected node
   const visibleEdges = useMemo(() => {
-    if (!selectedNodeId) return data.edges;
+    if (!selectedNodeId) return edges;
     
-    return data.edges.filter(
+    return edges.filter(
       (edge) => edge.source === selectedNodeId || edge.target === selectedNodeId
     );
-  }, [selectedNodeId, data.edges]);
+  }, [selectedNodeId, edges]);
 
   const handleWheel = useCallback((e: WheelEvent) => {
     e.preventDefault();

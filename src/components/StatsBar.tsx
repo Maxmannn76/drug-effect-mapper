@@ -7,16 +7,19 @@ interface StatsBarProps {
 }
 
 export function StatsBar({ data, threshold }: StatsBarProps) {
+  const nodes = data?.nodes ?? [];
+  const edges = data?.edges ?? [];
+
   const stats = [
     {
       icon: Database,
       label: "Drugs",
-      value: data.nodes.length,
+      value: nodes.length,
     },
     {
       icon: GitBranch,
       label: "Connections",
-      value: data.edges.length,
+      value: edges.length,
     },
     {
       icon: Activity,
@@ -26,8 +29,8 @@ export function StatsBar({ data, threshold }: StatsBarProps) {
     {
       icon: Zap,
       label: "Avg Similarity",
-      value: data.edges.length > 0
-        ? `${((data.edges.reduce((s, e) => s + e.similarity, 0) / data.edges.length) * 100).toFixed(0)}%`
+      value: edges.length > 0
+        ? `${((edges.reduce((s, e) => s + e.similarity, 0) / edges.length) * 100).toFixed(0)}%`
         : "N/A",
     },
   ];
