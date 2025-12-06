@@ -58,9 +58,20 @@ export function NetworkGraph({
     const positions = new Map<string, { x: number; y: number }>();
 
     if (!selectedNodeId) {
-      // No selection: use original positions
-      nodes.forEach((node) => {
-        positions.set(node.id, { x: node.x || 0, y: node.y || 0 });
+      // No selection: arrange all nodes in a circular layout centered in the view
+      const count = nodes.length;
+      const radius = Math.min(MAX_RADIUS, 50 + count * 3); // Scale radius with node count
+      
+      nodes.forEach((node, index) => {
+        // Use provided positions if available, otherwise compute circular layout
+        if (node.x !== undefined && node.y !== undefined && node.x !== 0 && node.y !== 0) {
+          positions.set(node.id, { x: node.x, y: node.y });
+        } else {
+          const angle = (2 * Math.PI * index) / count - Math.PI / 2; // Start from top
+          const x = CENTER_X + Math.cos(angle) * radius;
+          const y = CENTER_Y + Math.sin(angle) * radius;
+          positions.set(node.id, { x, y });
+        }
       });
       return positions;
     }
