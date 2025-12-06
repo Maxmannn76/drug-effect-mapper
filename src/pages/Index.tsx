@@ -113,14 +113,6 @@ const Index = () => {
                 <StatsBar data={networkData} threshold={threshold} />
               </div>
 
-              {/* Selected Drug Details */}
-              {selectedDrug && (
-                <DrugDetailsPanel
-                  drug={selectedDrug}
-                  similarDrugs={similarDrugs}
-                  onSelectSimilar={handleSelectSimilar}
-                />
-              )}
             </div>
 
             {/* Center Panel: Network Graph */}
@@ -143,9 +135,27 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Right Chatbot Column - 1/4 of screen */}
-      <div className="w-full md:w-1/4 md:min-w-[280px] md:max-w-[400px] h-[400px] md:h-auto border-t md:border-t-0 md:border-l border-border/50 bg-card/30 p-4">
-        <ChatBot />
+      {/* Right Column - Drug Details + Chatbot */}
+      <div className="w-full md:w-1/4 md:min-w-[300px] md:max-w-[420px] h-[600px] md:h-auto border-t md:border-t-0 md:border-l border-border/50 bg-card/30 flex flex-col">
+        {/* Top: Drug Details */}
+        <div className="flex-shrink-0 p-4 border-b border-border/50 overflow-auto max-h-[45%]">
+          {selectedDrug ? (
+            <DrugDetailsPanel
+              drug={selectedDrug}
+              similarDrugs={similarDrugs}
+              onSelectSimilar={handleSelectSimilar}
+            />
+          ) : (
+            <div className="glass-panel rounded-xl p-4 text-center text-muted-foreground">
+              <p className="text-sm">Select a drug from the network to view details</p>
+            </div>
+          )}
+        </div>
+        
+        {/* Bottom: Chatbot */}
+        <div className="flex-1 p-4 min-h-0">
+          <ChatBot />
+        </div>
       </div>
     </div>
   );
