@@ -7,55 +7,55 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 220 15% 15%;
+    --foreground: 215 25% 15%;
 
-    --card: 0 0% 98%;
-    --card-foreground: 220 15% 15%;
+    --card: 210 20% 98%;
+    --card-foreground: 215 25% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 15% 15%;
+    --popover-foreground: 215 25% 15%;
 
-    --primary: 135 90% 40%;
+    --primary: 210 90% 50%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 160 10% 94%;
-    --secondary-foreground: 220 15% 25%;
+    --secondary: 210 15% 94%;
+    --secondary-foreground: 215 25% 25%;
 
-    --muted: 160 10% 92%;
-    --muted-foreground: 220 10% 45%;
+    --muted: 210 15% 92%;
+    --muted-foreground: 215 15% 45%;
 
-    --accent: 150 85% 45%;
+    --accent: 200 85% 55%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 70% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 10% 88%;
-    --input: 220 10% 92%;
-    --ring: 135 90% 40%;
+    --border: 210 15% 88%;
+    --input: 210 15% 92%;
+    --ring: 210 90% 50%;
 
     --radius: 0.75rem;
 
-    /* Custom tokens */
-    --glow-primary: 135 90% 40%;
-    --glow-accent: 150 85% 45%;
-    --node-default: 140 75% 40%;
-    --node-selected: 135 90% 45%;
-    --node-hover: 130 95% 50%;
-    --edge-default: 220 10% 75%;
-    --edge-active: 135 85% 40%;
-    --surface-elevated: 0 0% 99%;
+    /* Custom tokens - Blue theme */
+    --glow-primary: 210 90% 50%;
+    --glow-accent: 200 85% 55%;
+    --node-default: 210 75% 50%;
+    --node-selected: 210 90% 55%;
+    --node-hover: 200 95% 60%;
+    --edge-default: 210 15% 75%;
+    --edge-active: 210 85% 50%;
+    --surface-elevated: 210 20% 99%;
 
     --gradient-mesh: none;
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 220 15% 20%;
-    --sidebar-primary: 135 90% 40%;
+    --sidebar-background: 210 20% 98%;
+    --sidebar-foreground: 215 25% 20%;
+    --sidebar-primary: 210 90% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 160 10% 94%;
-    --sidebar-accent-foreground: 220 15% 20%;
-    --sidebar-border: 220 10% 88%;
-    --sidebar-ring: 135 90% 40%;
+    --sidebar-accent: 210 15% 94%;
+    --sidebar-accent-foreground: 215 25% 20%;
+    --sidebar-border: 210 15% 88%;
+    --sidebar-ring: 210 90% 50%;
   }
 
   .dark {
