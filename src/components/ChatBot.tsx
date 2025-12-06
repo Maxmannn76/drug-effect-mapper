@@ -2,8 +2,9 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, Bot, User } from "lucide-react";
+import { Send, Bot, User, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Message {
   id: string;
@@ -14,24 +15,75 @@ interface Message {
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/drug-chat`;
 
+const WELCOME_MESSAGE: Message = {
+  id: "welcome",
+  role: "assistant",
+  content: "Hello! I'm your drug repurposing assistant. Ask me about drug similarities, mechanisms of action, or how to interpret the network visualization.",
+  timestamp: new Date(),
+};
+
 export const ChatBot = () => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      role: "assistant",
-      content: "Hello! I'm your drug repurposing assistant. Ask me about drug similarities, mechanisms of action, or how to interpret the network visualization.",
-      timestamp: new Date(),
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([WELCOME_MESSAGE]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Load chat history on mount
+  useEffect(() => {
+    const loadHistory = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("chat_messages")
+          .select("*")
+          .order("created_at", { ascending: true });
+
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+          const loadedMessages: Message[] = data.map((msg) => ({
+            id: msg.id,
+            role: msg.role as "user" | "assistant",
+            content: msg.content,
+            timestamp: new Date(msg.created_at),
+          }));
+          setMessages([WELCOME_MESSAGE, ...loadedMessages]);
+        }
+      } catch (error) {
+        console.error("Error loading chat history:", error);
+      } finally {
+        setIsLoadingHistory(false);
+      }
+    };
+
+    loadHistory();
+  }, []);
 
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
+
+  const saveMessage = async (role: "user" | "assistant", content: string) => {
+    try {
+      await supabase.from("chat_messages").insert({ role, content });
+    } catch (error) {
+      console.error("Error saving message:", error);
+    }
+  };
+
+  const clearHistory = async () => {
+    try {
+      const { error } = await supabase.from("chat_messages").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+      if (error) throw error;
+      setMessages([WELCOME_MESSAGE]);
+      toast.success("Chat history cleared");
+    } catch (error) {
+      console.error("Error clearing history:", error);
+      toast.error("Failed to clear history");
+    }
+  };
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
@@ -43,14 +95,19 @@ export const ChatBot = () => {
       timestamp: new Date(),
     };
 
-    const chatMessages = [...messages, userMessage].map(m => ({
-      role: m.role,
-      content: m.content
-    }));
+    const chatMessages = [...messages, userMessage]
+      .filter(m => m.id !== "welcome")
+      .map(m => ({
+        role: m.role,
+        content: m.content
+      }));
 
     setMessages(prev => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
+
+    // Save user message
+    await saveMessage("user", userMessage.content);
 
     let assistantContent = "";
 
@@ -123,17 +180,22 @@ export const ChatBot = () => {
           }
         }
       }
+      // Save assistant message after streaming completes
+      if (assistantContent) {
+        await saveMessage("assistant", assistantContent);
+      }
     } catch (error) {
       console.error("Chat error:", error);
       toast.error(error instanceof Error ? error.message : "Failed to get response");
       
       if (!assistantContent) {
+        const errorContent = "Sorry, I encountered an error. Please try again.";
         setMessages(prev => [
           ...prev,
           {
             id: `error-${Date.now()}`,
             role: "assistant",
-            content: "Sorry, I encountered an error. Please try again.",
+            content: errorContent,
             timestamp: new Date(),
           },
         ]);
@@ -154,20 +216,36 @@ export const ChatBot = () => {
     <div className="flex flex-col h-full glass-panel rounded-xl overflow-hidden">
       {/* Header */}
       <div className="p-4 border-b border-border/50 bg-card/50">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-            <Bot className="h-4 w-4 text-primary-foreground" />
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+              <Bot className="h-4 w-4 text-primary-foreground" />
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold">Research Assistant</h3>
+              <p className="text-xs text-muted-foreground">Powered by AI</p>
+            </div>
           </div>
-          <div>
-            <h3 className="text-sm font-semibold">Research Assistant</h3>
-            <p className="text-xs text-muted-foreground">Powered by AI</p>
-          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={clearHistory}
+            className="h-8 w-8 text-muted-foreground hover:text-destructive"
+            title="Clear chat history"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
         </div>
       </div>
 
       {/* Messages */}
       <ScrollArea className="flex-1 p-4" ref={scrollRef}>
         <div className="space-y-4">
+          {isLoadingHistory && (
+            <div className="text-center text-muted-foreground text-sm py-2">
+              Loading chat history...
+            </div>
+          )}
           {messages.map((message) => (
             <div
               key={message.id}
