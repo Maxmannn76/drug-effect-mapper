@@ -11,7 +11,7 @@ serve(async (req) => {
   }
 
   try {
-    const { messages } = await req.json();
+    const { messages, context } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
@@ -19,6 +19,42 @@ serve(async (req) => {
     }
 
     console.log("Sending request to Lovable AI Gateway with messages:", messages.length);
+    console.log("Context provided:", context ? JSON.stringify(context) : "none");
+
+    // Build context-aware system prompt
+    let systemPrompt = `You are Elix, a drug repurposing research assistant. Be VERY CONCISE - aim for 2-3 sentences max unless asked for details.
+
+You help with:
+- Drug similarity networks and interpreting connections
+- Mechanisms of action (MoA)
+- Tahoe-x1 embeddings and cosine similarity scores
+- Drug repurposing concepts and research`;
+
+    // Add current dashboard context if available
+    if (context?.selectedDrug) {
+      systemPrompt += `
+
+CURRENT CONTEXT - The user is viewing:
+- Selected Drug: ${context.selectedDrug.drug} (ID: ${context.selectedDrug.id})
+- Mechanism: ${context.selectedDrug.mechanism || "Unknown"}
+- Cell Line: ${context.selectedDrug.cell_line || "Unknown"}
+- Samples Aggregated: ${context.selectedDrug.samples_aggregated || "Unknown"}`;
+      
+      if (context.similarDrugs && context.similarDrugs.length > 0) {
+        systemPrompt += `
+- Similar Drugs Found: ${context.similarDrugs.length}
+- Top Similar: ${context.similarDrugs.slice(0, 3).map((d: any) => `${d.drugName || d.drugId} (${(d.similarity * 100).toFixed(0)}%)`).join(", ")}`;
+      }
+      
+      if (context.threshold) {
+        systemPrompt += `
+- Current Similarity Threshold: ${(context.threshold * 100).toFixed(0)}%`;
+      }
+    }
+
+    systemPrompt += `
+
+Use this context to give relevant, personalized answers about what the user is currently exploring. Short, direct answers unless more detail is requested.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -29,16 +65,7 @@ serve(async (req) => {
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
-          {
-            role: "system",
-            content: `You are a drug repurposing research assistant. Be VERY CONCISE - aim for 2-3 sentences max unless asked for details. Help with:
-- Drug similarity networks
-- Mechanisms of action (MoA)  
-- Tahoe-x1 embeddings and cosine similarity
-- Drug repurposing concepts
-
-Short, direct answers. No lengthy explanations unless specifically requested.`
-          },
+          { role: "system", content: systemPrompt },
           ...messages,
         ],
         stream: true,

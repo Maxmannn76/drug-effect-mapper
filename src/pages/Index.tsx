@@ -199,7 +199,12 @@ const Index = () => {
         
         {/* Bottom: Chatbot */}
         <div className="flex-1 p-4 min-h-0 overflow-hidden">
-          <ChatBot />
+          <ChatBot 
+            selectedDrug={selectedDrug}
+            similarDrugs={similarDrugs}
+            allDrugs={drugs}
+            threshold={threshold}
+          />
         </div>
       </div>
     </div>
