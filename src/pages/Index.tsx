@@ -112,10 +112,10 @@ const Index = () => {
             <div className="flex items-center gap-4">
               {/* Stylized DrugDruid Logo */}
               <div className="flex items-center">
-                <span className="text-5xl md:text-6xl font-bold text-gradient-primary leading-none">D</span>
-                <div className="flex flex-col -ml-0.5 leading-tight">
-                  <span className="text-xl md:text-2xl font-bold text-gradient-primary">rug</span>
-                  <span className="text-xl md:text-2xl font-bold text-gradient-primary">ruid</span>
+                <span className="text-7xl md:text-8xl font-bold text-gradient-primary leading-none">D</span>
+                <div className="flex flex-col -ml-1 leading-none -space-y-1">
+                  <span className="text-2xl md:text-3xl font-bold text-gradient-primary">rug</span>
+                  <span className="text-2xl md:text-3xl font-bold text-gradient-primary">ruid</span>
                 </div>
               </div>
               <div className="hidden sm:block h-10 w-px bg-border/50" />
