@@ -6,63 +6,61 @@
 
 @layer base {
   :root {
-    --background: 160 20% 6%;
-    --foreground: 150 20% 95%;
+    --background: 0 0% 100%;
+    --foreground: 220 15% 15%;
 
-    --card: 160 18% 9%;
-    --card-foreground: 150 20% 95%;
+    --card: 0 0% 98%;
+    --card-foreground: 220 15% 15%;
 
-    --popover: 160 18% 9%;
-    --popover-foreground: 150 20% 95%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 15% 15%;
 
-    --primary: 135 90% 50%;
-    --primary-foreground: 160 20% 6%;
+    --primary: 135 90% 40%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 160 15% 14%;
-    --secondary-foreground: 150 20% 85%;
+    --secondary: 160 10% 94%;
+    --secondary-foreground: 220 15% 25%;
 
-    --muted: 160 15% 17%;
-    --muted-foreground: 155 15% 55%;
+    --muted: 160 10% 92%;
+    --muted-foreground: 220 10% 45%;
 
-    --accent: 150 85% 55%;
-    --accent-foreground: 160 20% 6%;
+    --accent: 150 85% 45%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 70% 55%;
-    --destructive-foreground: 150 20% 95%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 160 15% 18%;
-    --input: 160 15% 16%;
-    --ring: 135 90% 50%;
+    --border: 220 10% 88%;
+    --input: 220 10% 92%;
+    --ring: 135 90% 40%;
 
     --radius: 0.75rem;
 
     /* Custom tokens */
-    --glow-primary: 135 90% 50%;
-    --glow-accent: 150 85% 55%;
-    --node-default: 140 75% 48%;
-    --node-selected: 135 90% 55%;
-    --node-hover: 130 95% 65%;
-    --edge-default: 160 20% 28%;
-    --edge-active: 135 85% 48%;
-    --surface-elevated: 160 18% 11%;
+    --glow-primary: 135 90% 40%;
+    --glow-accent: 150 85% 45%;
+    --node-default: 140 75% 40%;
+    --node-selected: 135 90% 45%;
+    --node-hover: 130 95% 50%;
+    --edge-default: 220 10% 75%;
+    --edge-active: 135 85% 40%;
+    --surface-elevated: 0 0% 99%;
 
-    --gradient-mesh: radial-gradient(at 20% 80%, hsl(135 90% 50% / 0.12) 0%, transparent 50%),
-                     radial-gradient(at 80% 20%, hsl(150 85% 55% / 0.1) 0%, transparent 50%),
-                     radial-gradient(at 50% 50%, hsl(160 20% 6%) 0%, hsl(160 20% 4%) 100%);
+    --gradient-mesh: none;
 
-    --sidebar-background: 160 18% 7%;
-    --sidebar-foreground: 150 20% 90%;
-    --sidebar-primary: 135 90% 50%;
-    --sidebar-primary-foreground: 160 20% 6%;
-    --sidebar-accent: 160 15% 14%;
-    --sidebar-accent-foreground: 150 20% 90%;
-    --sidebar-border: 160 15% 16%;
-    --sidebar-ring: 135 90% 50%;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 220 15% 20%;
+    --sidebar-primary: 135 90% 40%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 160 10% 94%;
+    --sidebar-accent-foreground: 220 15% 20%;
+    --sidebar-border: 220 10% 88%;
+    --sidebar-ring: 135 90% 40%;
   }
 
   .dark {
-    --background: 160 20% 6%;
-    --foreground: 150 20% 95%;
+    --background: 0 0% 100%;
+    --foreground: 220 15% 15%;
   }
 }
 
