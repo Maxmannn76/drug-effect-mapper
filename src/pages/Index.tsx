@@ -5,6 +5,7 @@ import { SimilaritySlider } from "@/components/SimilaritySlider";
 import { DrugDetailsPanel } from "@/components/DrugDetailsPanel";
 import { StatsBar } from "@/components/StatsBar";
 import { ApiConnectionBanner } from "@/components/ApiConnectionBanner";
+import { ChatBot } from "@/components/ChatBot";
 import { useApiConnection } from "@/hooks/useApiConnection";
 import { Drug } from "@/types/drug";
 import { mockDrugs, generateNetworkData, getSimilarDrugs, getDrugById } from "@/data/mockData";
@@ -59,84 +60,92 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen p-4 md:p-6 lg:p-8">
-      <div className="max-w-[1600px] mx-auto space-y-6">
-        {/* Header */}
-        <header className="space-y-2 animate-fade-in">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-              <Dna className="h-5 w-5 text-primary-foreground" />
+    <div className="min-h-screen flex">
+      {/* Main Dashboard */}
+      <div className="flex-1 p-4 md:p-6 lg:p-8 overflow-auto">
+        <div className="max-w-[1200px] mx-auto space-y-6">
+          {/* Header */}
+          <header className="space-y-2 animate-fade-in">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                <Dna className="h-5 w-5 text-primary-foreground" />
+              </div>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold text-gradient-primary">
+                  Drug Repurposing Engine
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  Discover drugs with similar cellular responses via Tahoe-x1 embeddings
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gradient-primary">
-                Drug Repurposing Engine
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                Discover drugs with similar cellular responses via Tahoe-x1 embeddings
-              </p>
-            </div>
+          </header>
+
+          {/* API Connection Banner */}
+          <div className="animate-fade-in-delay-1">
+            <ApiConnectionBanner isConnected={api.isConnected} onConnect={handleApiConnect} />
           </div>
-        </header>
 
-        {/* API Connection Banner */}
-        <div className="animate-fade-in-delay-1">
-          <ApiConnectionBanner isConnected={api.isConnected} onConnect={handleApiConnect} />
-        </div>
+          {/* Main Content */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left Panel: Controls */}
+            <div className="space-y-4 animate-fade-in-delay-2">
+              {/* Search */}
+              <div className="glass-panel rounded-xl p-4 space-y-4">
+                <h3 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                  <Share2 className="h-4 w-4" />
+                  Query Drug
+                </h3>
+                <DrugSearch
+                  drugs={mockDrugs}
+                  selectedDrug={selectedDrug}
+                  onSelectDrug={setSelectedDrug}
+                />
+              </div>
 
-        {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Panel: Controls */}
-          <div className="space-y-4 animate-fade-in-delay-2">
-            {/* Search */}
-            <div className="glass-panel rounded-xl p-4 space-y-4">
-              <h3 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <Share2 className="h-4 w-4" />
-                Query Drug
-              </h3>
-              <DrugSearch
-                drugs={mockDrugs}
-                selectedDrug={selectedDrug}
-                onSelectDrug={setSelectedDrug}
+              {/* Threshold Slider */}
+              <div className="glass-panel rounded-xl p-4">
+                <SimilaritySlider value={threshold} onChange={setThreshold} />
+              </div>
+
+              {/* Stats */}
+              <div className="glass-panel rounded-xl p-4">
+                <StatsBar data={networkData} threshold={threshold} />
+              </div>
+
+              {/* Selected Drug Details */}
+              {selectedDrug && (
+                <DrugDetailsPanel
+                  drug={selectedDrug}
+                  similarDrugs={similarDrugs}
+                  onSelectSimilar={handleSelectSimilar}
+                />
+              )}
+            </div>
+
+            {/* Center Panel: Network Graph */}
+            <div className="lg:col-span-2 animate-fade-in-delay-3">
+              <NetworkGraph
+                data={networkData}
+                selectedNodeId={selectedNodeId}
+                onSelectNode={handleSelectNode}
+                className="h-[500px] md:h-[600px] lg:h-[700px]"
               />
             </div>
-
-            {/* Threshold Slider */}
-            <div className="glass-panel rounded-xl p-4">
-              <SimilaritySlider value={threshold} onChange={setThreshold} />
-            </div>
-
-            {/* Stats */}
-            <div className="glass-panel rounded-xl p-4">
-              <StatsBar data={networkData} threshold={threshold} />
-            </div>
-
-            {/* Selected Drug Details */}
-            {selectedDrug && (
-              <DrugDetailsPanel
-                drug={selectedDrug}
-                similarDrugs={similarDrugs}
-                onSelectSimilar={handleSelectSimilar}
-              />
-            )}
           </div>
 
-          {/* Right Panel: Network Graph */}
-          <div className="lg:col-span-2 animate-fade-in-delay-3">
-            <NetworkGraph
-              data={networkData}
-              selectedNodeId={selectedNodeId}
-              onSelectNode={handleSelectNode}
-              className="h-[500px] md:h-[600px] lg:h-[700px]"
-            />
-          </div>
+          {/* Footer */}
+          <footer className="text-center text-xs text-muted-foreground pt-8 pb-4">
+            <p>
+              Built for drug repurposing research • Delta embeddings computed via Tahoe-x1
+            </p>
+          </footer>
         </div>
+      </div>
 
-        {/* Footer */}
-        <footer className="text-center text-xs text-muted-foreground pt-8 pb-4">
-          <p>
-            Built for drug repurposing research • Delta embeddings computed via Tahoe-x1
-          </p>
-        </footer>
+      {/* Right Chatbot Column */}
+      <div className="hidden lg:block w-[380px] border-l border-border/50 bg-card/30 p-4">
+        <ChatBot />
       </div>
     </div>
   );
