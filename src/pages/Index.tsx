@@ -60,7 +60,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex flex-col md:flex-row">
       {/* Main Dashboard */}
       <div className="flex-1 p-4 md:p-6 lg:p-8 overflow-auto">
         <div className="max-w-[1200px] mx-auto space-y-6">
@@ -143,8 +143,8 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Right Chatbot Column */}
-      <div className="hidden lg:block w-[380px] border-l border-border/50 bg-card/30 p-4">
+      {/* Right Chatbot Column - 1/4 of screen */}
+      <div className="w-full md:w-1/4 md:min-w-[280px] md:max-w-[400px] h-[400px] md:h-auto border-t md:border-t-0 md:border-l border-border/50 bg-card/30 p-4">
         <ChatBot />
       </div>
     </div>
