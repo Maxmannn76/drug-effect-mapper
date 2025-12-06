@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { NetworkGraph } from "@/components/NetworkGraph";
 import { DrugSearch } from "@/components/DrugSearch";
 import { SimilaritySlider } from "@/components/SimilaritySlider";
@@ -7,7 +7,7 @@ import { StatsBar } from "@/components/StatsBar";
 import { ApiConnectionBanner } from "@/components/ApiConnectionBanner";
 import { ChatBot } from "@/components/ChatBot";
 import { useApiConnection } from "@/hooks/useApiConnection";
-import { Drug } from "@/types/drug";
+import { Drug, NetworkData, DrugSimilarity } from "@/types/drug";
 import { mockDrugs, generateNetworkData, getSimilarDrugs, getDrugById } from "@/data/mockData";
 import { Dna, Share2 } from "lucide-react";
 
@@ -15,24 +15,69 @@ const Index = () => {
   const [threshold, setThreshold] = useState(0.5);
   const [selectedDrug, setSelectedDrug] = useState<Drug | null>(null);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [drugs, setDrugs] = useState<Drug[]>(mockDrugs);
+  const [networkData, setNetworkData] = useState<NetworkData>(() => generateNetworkData(0.5));
+  const [similarDrugs, setSimilarDrugs] = useState<DrugSimilarity[]>([]);
+  const [isLoadingNetwork, setIsLoadingNetwork] = useState(false);
+  
   const api = useApiConnection();
 
-  // Generate network data based on threshold
-  const networkData = useMemo(() => generateNetworkData(threshold), [threshold]);
+  // Load drugs list
+  useEffect(() => {
+    const loadDrugs = async () => {
+      try {
+        const data = await api.fetchDrugs();
+        setDrugs(data);
+      } catch (err) {
+        console.error("Failed to load drugs:", err);
+      }
+    };
+    loadDrugs();
+  }, [api.isConnected]);
 
-  // Get similar drugs for selected drug
-  const similarDrugs = useMemo(() => {
-    if (!selectedDrug) return [];
-    return getSimilarDrugs(selectedDrug.id, threshold);
-  }, [selectedDrug, threshold]);
+  // Load network data when threshold changes or API connects
+  useEffect(() => {
+    const loadNetwork = async () => {
+      setIsLoadingNetwork(true);
+      try {
+        const data = await api.fetchNetworkData(threshold);
+        setNetworkData(data);
+      } catch (err) {
+        console.error("Failed to load network:", err);
+        // Fall back to mock data
+        setNetworkData(generateNetworkData(threshold));
+      } finally {
+        setIsLoadingNetwork(false);
+      }
+    };
+    loadNetwork();
+  }, [threshold, api.isConnected]);
+
+  // Load similar drugs when selection or threshold changes
+  useEffect(() => {
+    const loadSimilar = async () => {
+      if (!selectedDrug) {
+        setSimilarDrugs([]);
+        return;
+      }
+      try {
+        const data = await api.fetchSimilarDrugs(selectedDrug.id, threshold);
+        setSimilarDrugs(data);
+      } catch (err) {
+        console.error("Failed to load similar drugs:", err);
+        setSimilarDrugs(getSimilarDrugs(selectedDrug.id, threshold));
+      }
+    };
+    loadSimilar();
+  }, [selectedDrug, threshold, api.isConnected]);
 
   // Sync selected drug with node selection
   useEffect(() => {
     if (selectedNodeId) {
-      const drug = getDrugById(selectedNodeId);
+      const drug = drugs.find(d => d.id === selectedNodeId);
       if (drug) setSelectedDrug(drug);
     }
-  }, [selectedNodeId]);
+  }, [selectedNodeId, drugs]);
 
   useEffect(() => {
     if (selectedDrug) {
@@ -46,7 +91,7 @@ const Index = () => {
   };
 
   const handleSelectSimilar = (drugId: string) => {
-    const drug = getDrugById(drugId);
+    const drug = drugs.find(d => d.id === drugId);
     if (drug) {
       setSelectedDrug(drug);
       setSelectedNodeId(drugId);
@@ -54,9 +99,7 @@ const Index = () => {
   };
 
   const handleApiConnect = async (url: string) => {
-    // In real implementation, configure and test the API connection
-    console.log("Connecting to:", url);
-    return api.connect();
+    return api.connect(url);
   };
 
   return (
@@ -97,7 +140,7 @@ const Index = () => {
                   Query Drug
                 </h3>
                 <DrugSearch
-                  drugs={mockDrugs}
+                  drugs={drugs}
                   selectedDrug={selectedDrug}
                   onSelectDrug={setSelectedDrug}
                 />
@@ -116,7 +159,12 @@ const Index = () => {
             </div>
 
             {/* Center Panel: Network Graph */}
-            <div className="lg:col-span-2 animate-fade-in-delay-3">
+            <div className="lg:col-span-2 animate-fade-in-delay-3 relative">
+              {isLoadingNetwork && (
+                <div className="absolute inset-0 flex items-center justify-center bg-background/50 z-10 rounded-xl">
+                  <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full" />
+                </div>
+              )}
               <NetworkGraph
                 data={networkData}
                 selectedNodeId={selectedNodeId}

@@ -1,78 +1,94 @@
 import { useState, useCallback } from "react";
-import { ApiConfig, NetworkData, Drug, DrugSimilarity } from "@/types/drug";
+import { NetworkData, Drug, DrugSimilarity } from "@/types/drug";
 import { mockDrugs, generateNetworkData, getSimilarDrugs } from "@/data/mockData";
-
-// Hook to manage API connection state
-// Currently uses mock data, but structured to easily swap in real API calls
 
 interface ApiState {
   isConnected: boolean;
   isLoading: boolean;
   error: string | null;
+  baseUrl: string | null;
 }
 
-export function useApiConnection(config?: ApiConfig) {
+export function useApiConnection() {
   const [state, setState] = useState<ApiState>({
-    isConnected: false, // Set to true when using mock data
+    isConnected: false,
     isLoading: false,
     error: null,
+    baseUrl: null,
   });
 
-  // Simulate API connection
-  const connect = useCallback(async () => {
+  // Test connection to the API
+  const connect = useCallback(async (url: string) => {
     setState((prev) => ({ ...prev, isLoading: true, error: null }));
     
     try {
-      // In real implementation, this would ping the API
-      // For now, we just simulate a successful connection
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      setState({ isConnected: true, isLoading: false, error: null });
+      // Test the API by fetching drugs list
+      const response = await fetch(`${url}/api/drugs`);
+      if (!response.ok) throw new Error("Failed to connect to API");
+      
+      setState({ isConnected: true, isLoading: false, error: null, baseUrl: url });
       return true;
     } catch (err) {
       setState({
         isConnected: false,
         isLoading: false,
         error: err instanceof Error ? err.message : "Failed to connect",
+        baseUrl: null,
       });
       return false;
     }
   }, []);
 
+  // Disconnect from API (fall back to mock data)
+  const disconnect = useCallback(() => {
+    setState({ isConnected: false, isLoading: false, error: null, baseUrl: null });
+  }, []);
+
   // Fetch network data
   const fetchNetworkData = useCallback(
     async (threshold: number): Promise<NetworkData> => {
-      if (config?.baseUrl) {
-        // Real API call
+      if (state.baseUrl) {
         const response = await fetch(
-          `${config.baseUrl}${config.endpoints.network}?threshold=${threshold}`
+          `${state.baseUrl}/api/network?threshold=${threshold}`
         );
         if (!response.ok) throw new Error("Failed to fetch network data");
         return response.json();
       }
       
-      // Mock data
+      // Fall back to mock data
       return generateNetworkData(threshold);
     },
-    [config]
+    [state.baseUrl]
   );
 
   // Fetch drugs list
   const fetchDrugs = useCallback(async (): Promise<Drug[]> => {
-    if (config?.baseUrl) {
-      const response = await fetch(`${config.baseUrl}${config.endpoints.drugs}`);
+    if (state.baseUrl) {
+      const response = await fetch(`${state.baseUrl}/api/drugs`);
       if (!response.ok) throw new Error("Failed to fetch drugs");
       return response.json();
     }
     
     return mockDrugs;
-  }, [config]);
+  }, [state.baseUrl]);
+
+  // Fetch single drug by ID
+  const fetchDrug = useCallback(async (drugId: string): Promise<Drug | null> => {
+    if (state.baseUrl) {
+      const response = await fetch(`${state.baseUrl}/api/drugs/${drugId}`);
+      if (!response.ok) return null;
+      return response.json();
+    }
+    
+    return mockDrugs.find(d => d.id === drugId) || null;
+  }, [state.baseUrl]);
 
   // Fetch similar drugs for a given drug
   const fetchSimilarDrugs = useCallback(
     async (drugId: string, threshold: number): Promise<DrugSimilarity[]> => {
-      if (config?.baseUrl) {
+      if (state.baseUrl) {
         const response = await fetch(
-          `${config.baseUrl}${config.endpoints.similarities}?drugId=${drugId}&threshold=${threshold}`
+          `${state.baseUrl}/api/similar/${drugId}?threshold=${threshold}`
         );
         if (!response.ok) throw new Error("Failed to fetch similarities");
         return response.json();
@@ -80,14 +96,16 @@ export function useApiConnection(config?: ApiConfig) {
       
       return getSimilarDrugs(drugId, threshold);
     },
-    [config]
+    [state.baseUrl]
   );
 
   return {
     ...state,
     connect,
+    disconnect,
     fetchNetworkData,
     fetchDrugs,
+    fetchDrug,
     fetchSimilarDrugs,
   };
 }
