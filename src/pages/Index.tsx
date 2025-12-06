@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { NetworkGraph } from "@/components/NetworkGraph";
 import { DrugSearch } from "@/components/DrugSearch";
 import { SimilaritySlider } from "@/components/SimilaritySlider";
@@ -8,7 +8,6 @@ import { ApiConnectionBanner } from "@/components/ApiConnectionBanner";
 import { ChatBot } from "@/components/ChatBot";
 import { useApiConnection } from "@/hooks/useApiConnection";
 import { Drug, NetworkData, DrugSimilarity } from "@/types/drug";
-import { mockDrugs, generateNetworkData, getSimilarDrugs, getDrugById } from "@/data/mockData";
 import { Share2 } from "lucide-react";
 import elixLogo from "@/assets/elix-logo.png";
 
@@ -16,8 +15,8 @@ const Index = () => {
   const [threshold, setThreshold] = useState(0.5);
   const [selectedDrug, setSelectedDrug] = useState<Drug | null>(null);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
-  const [drugs, setDrugs] = useState<Drug[]>(mockDrugs);
-  const [networkData, setNetworkData] = useState<NetworkData>(() => generateNetworkData(0.5));
+  const [drugs, setDrugs] = useState<Drug[]>([]);
+  const [networkData, setNetworkData] = useState<NetworkData>({ nodes: [], edges: [] });
   const [similarDrugs, setSimilarDrugs] = useState<DrugSimilarity[]>([]);
   const [isLoadingNetwork, setIsLoadingNetwork] = useState(false);
   
@@ -45,8 +44,6 @@ const Index = () => {
         setNetworkData(data);
       } catch (err) {
         console.error("Failed to load network:", err);
-        // Fall back to mock data
-        setNetworkData(generateNetworkData(threshold));
       } finally {
         setIsLoadingNetwork(false);
       }
@@ -66,7 +63,7 @@ const Index = () => {
         setSimilarDrugs(data);
       } catch (err) {
         console.error("Failed to load similar drugs:", err);
-        setSimilarDrugs(getSimilarDrugs(selectedDrug.id, threshold));
+        setSimilarDrugs([]);
       }
     };
     loadSimilar();
@@ -99,8 +96,8 @@ const Index = () => {
     }
   };
 
-  const handleApiConnect = async (url: string) => {
-    return api.connect(url);
+  const handleApiConnect = async () => {
+    return api.connect();
   };
 
   return (
@@ -190,6 +187,7 @@ const Index = () => {
             <DrugDetailsPanel
               drug={selectedDrug}
               similarDrugs={similarDrugs}
+              allDrugs={drugs}
               onSelectSimilar={handleSelectSimilar}
             />
           ) : (

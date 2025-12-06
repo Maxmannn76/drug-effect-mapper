@@ -1,25 +1,20 @@
 import { useState } from "react";
-import { Cloud, CloudOff, Settings, X } from "lucide-react";
+import { Cloud, CloudOff, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 interface ApiConnectionBannerProps {
   isConnected: boolean;
-  onConnect: (url: string) => Promise<boolean>;
+  onConnect: () => Promise<boolean>;
 }
 
 export function ApiConnectionBanner({ isConnected, onConnect }: ApiConnectionBannerProps) {
-  const [showConfig, setShowConfig] = useState(false);
-  const [apiUrl, setApiUrl] = useState("");
   const [isConnecting, setIsConnecting] = useState(false);
 
-  const handleConnect = async () => {
-    if (!apiUrl.trim()) return;
+  const handleRetry = async () => {
     setIsConnecting(true);
-    await onConnect(apiUrl);
+    await onConnect();
     setIsConnecting(false);
-    setShowConfig(false);
   };
 
   return (
@@ -28,7 +23,7 @@ export function ApiConnectionBanner({ isConnected, onConnect }: ApiConnectionBan
         "rounded-lg border px-4 py-3 text-sm transition-colors",
         isConnected
           ? "border-primary/30 bg-primary/5 text-primary"
-          : "border-border bg-card/50 text-muted-foreground"
+          : "border-destructive/30 bg-destructive/5 text-destructive"
       )}
     >
       <div className="flex items-center justify-between">
@@ -41,38 +36,22 @@ export function ApiConnectionBanner({ isConnected, onConnect }: ApiConnectionBan
           <span>
             {isConnected
               ? "Connected to API"
-              : "Using mock data — connect your Python API for live results"}
+              : "Failed to connect to API"}
           </span>
         </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setShowConfig(!showConfig)}
-          className="h-8 px-2"
-        >
-          {showConfig ? <X className="h-4 w-4" /> : <Settings className="h-4 w-4" />}
-        </Button>
-      </div>
-
-      {showConfig && (
-        <div className="mt-3 pt-3 border-t border-border/50 flex gap-2">
-          <Input
-            placeholder="https://your-api.com"
-            value={apiUrl}
-            onChange={(e) => setApiUrl(e.target.value)}
-            className="flex-1 h-9 text-foreground"
-          />
+        {!isConnected && (
           <Button
-            variant="glow"
+            variant="ghost"
             size="sm"
-            onClick={handleConnect}
-            disabled={isConnecting || !apiUrl.trim()}
-            className="h-9"
+            onClick={handleRetry}
+            disabled={isConnecting}
+            className="h-8 px-2 gap-1"
           >
-            {isConnecting ? "Connecting..." : "Connect"}
+            <RefreshCw className={cn("h-4 w-4", isConnecting && "animate-spin")} />
+            {isConnecting ? "Retrying..." : "Retry"}
           </Button>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
