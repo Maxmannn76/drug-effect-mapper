@@ -109,9 +109,10 @@
   }
 
   .glass-panel {
-    background: hsl(var(--card) / 0.8);
+    background: hsl(var(--card));
     backdrop-filter: blur(12px);
-    border: 1px solid hsl(var(--border) / 0.5);
+    border: 2px solid hsl(220 15% 25%);
+    box-shadow: 0 2px 8px hsl(220 15% 15% / 0.1);
   }
 
   .animate-pulse-glow {
