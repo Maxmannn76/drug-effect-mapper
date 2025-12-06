@@ -101,23 +101,44 @@ const Index = () => {
     <div className="h-screen flex flex-col md:flex-row overflow-hidden">
       {/* Main Dashboard */}
       <div className="flex-1 p-4 md:p-6 lg:p-8 overflow-auto">
-        <div className="max-w-[1200px] mx-auto space-y-6">
+        <div className="max-w-[1400px] mx-auto space-y-6">
           {/* Header */}
           <header className="space-y-2 animate-fade-in">
-            <div className="flex items-center gap-4">
-              {/* ELIX Logo */}
-              <img src={elixLogo} alt="ELIX" className="h-16 md:h-20 w-auto" />
-              <div className="hidden sm:block h-10 w-px bg-border/50" />
-              <p className="hidden sm:block text-sm text-muted-foreground max-w-xs">
-                Find drugs with similar cellular responses
-              </p>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                {/* ELIX Logo */}
+                <img src={elixLogo} alt="ELIX" className="h-16 md:h-20 w-auto" />
+                <div className="hidden sm:block h-10 w-px bg-border/50" />
+                <p className="hidden sm:block text-sm text-muted-foreground max-w-xs">
+                  Find drugs with similar cellular responses
+                </p>
+              </div>
+              
+              {/* Top Right: Threshold & Stats */}
+              <div className="hidden lg:flex items-center gap-4">
+                <div className="glass-panel rounded-xl p-3 min-w-[200px]">
+                  <SimilaritySlider value={threshold} onChange={setThreshold} />
+                </div>
+                <div className="glass-panel rounded-xl p-3">
+                  <StatsBar data={networkData} threshold={threshold} />
+                </div>
+              </div>
             </div>
           </header>
 
+          {/* Mobile: Threshold & Stats (visible on small screens) */}
+          <div className="lg:hidden space-y-4">
+            <div className="glass-panel rounded-xl p-4">
+              <SimilaritySlider value={threshold} onChange={setThreshold} />
+            </div>
+            <div className="glass-panel rounded-xl p-4">
+              <StatsBar data={networkData} threshold={threshold} />
+            </div>
+          </div>
 
           {/* Main Content */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Panel: Controls */}
+            {/* Left Panel: Search + Drug Details */}
             <div className="space-y-4 animate-fade-in-delay-2">
               {/* Search */}
               <div className="glass-panel rounded-xl p-4 space-y-4">
@@ -132,16 +153,21 @@ const Index = () => {
                 />
               </div>
 
-              {/* Threshold Slider */}
-              <div className="glass-panel rounded-xl p-4">
-                <SimilaritySlider value={threshold} onChange={setThreshold} />
+              {/* Drug Details (moved from right panel) */}
+              <div className="animate-fade-in-delay-3">
+                {selectedDrug ? (
+                  <DrugDetailsPanel
+                    drug={selectedDrug}
+                    similarDrugs={similarDrugs}
+                    allDrugs={drugs}
+                    onSelectSimilar={handleSelectSimilar}
+                  />
+                ) : (
+                  <div className="glass-panel rounded-xl p-4 text-center text-muted-foreground">
+                    <p className="text-sm">Select a drug from the network to view details</p>
+                  </div>
+                )}
               </div>
-
-              {/* Stats */}
-              <div className="glass-panel rounded-xl p-4">
-                <StatsBar data={networkData} threshold={threshold} />
-              </div>
-
             </div>
 
             {/* Center Panel: Network Graph */}
@@ -172,25 +198,8 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Right Column - Drug Details + Chatbot */}
+      {/* Right Column - Chatbot only */}
       <div className="w-full md:w-1/4 md:min-w-[300px] md:max-w-[420px] md:h-full border-t md:border-t-0 md:border-l border-border/50 bg-card/30 flex flex-col overflow-hidden">
-        {/* Top: Drug Details */}
-        <div className="shrink-0 p-4 border-b border-border/50 overflow-auto max-h-[40%]">
-          {selectedDrug ? (
-            <DrugDetailsPanel
-              drug={selectedDrug}
-              similarDrugs={similarDrugs}
-              allDrugs={drugs}
-              onSelectSimilar={handleSelectSimilar}
-            />
-          ) : (
-            <div className="glass-panel rounded-xl p-4 text-center text-muted-foreground">
-              <p className="text-sm">Select a drug from the network to view details</p>
-            </div>
-          )}
-        </div>
-        
-        {/* Bottom: Chatbot */}
         <div className="flex-1 p-4 min-h-0 overflow-hidden">
           <ChatBot 
             selectedDrug={selectedDrug}
