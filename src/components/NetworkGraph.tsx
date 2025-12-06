@@ -211,9 +211,21 @@ export function NetworkGraph({
         </defs>
 
         <g transform={`translate(${transform.x}, ${transform.y}) scale(${transform.scale})`}>
+          {/* Background grid - always visible */}
+          <g opacity="0.08">
+            {/* Vertical lines */}
+            {[100, 200, 300, 400, 500, 600, 700].map((x) => (
+              <line key={`v-${x}`} x1={x} y1={0} x2={x} y2={700} stroke="hsl(var(--primary))" strokeWidth="1" />
+            ))}
+            {/* Horizontal lines */}
+            {[100, 200, 300, 400, 500, 600].map((y) => (
+              <line key={`h-${y}`} x1={0} y1={y} x2={800} y2={y} stroke="hsl(var(--primary))" strokeWidth="1" />
+            ))}
+          </g>
+
           {/* Distance circles when node is selected */}
           {selectedNodeId && (
-            <g opacity="0.15">
+            <g opacity="0.35">
               {[0.25, 0.5, 0.75, 1].map((ratio, i) => (
                 <circle
                   key={i}
@@ -222,8 +234,8 @@ export function NetworkGraph({
                   r={MIN_RADIUS + ratio * (MAX_RADIUS - MIN_RADIUS)}
                   fill="none"
                   stroke="hsl(var(--primary))"
-                  strokeWidth="1"
-                  strokeDasharray="4 4"
+                  strokeWidth="1.5"
+                  strokeDasharray="6 4"
                 />
               ))}
             </g>
