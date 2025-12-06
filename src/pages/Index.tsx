@@ -167,12 +167,6 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Footer */}
-          <footer className="text-center text-xs text-muted-foreground pt-8 pb-4">
-            <p>
-              Built for drug repurposing research • Delta embeddings computed via Tahoe-x1
-            </p>
-          </footer>
         </div>
       </div>
 
