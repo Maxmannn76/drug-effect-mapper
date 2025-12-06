@@ -1,5 +1,4 @@
 import { Drug, DrugSimilarity } from "@/types/drug";
-import { getDrugById } from "@/data/mockData";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { ArrowRight, Dna, FlaskConical, Microscope, ExternalLink, Loader2 } from "lucide-react";
@@ -8,15 +7,19 @@ import { usePubChemDrug } from "@/hooks/usePubChemDrug";
 interface DrugDetailsPanelProps {
   drug: Drug;
   similarDrugs: DrugSimilarity[];
+  allDrugs: Drug[];
   onSelectSimilar: (drugId: string) => void;
 }
 
 export function DrugDetailsPanel({
   drug,
   similarDrugs,
+  allDrugs,
   onSelectSimilar,
 }: DrugDetailsPanelProps) {
   const { description, pubchemUrl, isLoading, error } = usePubChemDrug(drug.drug);
+
+  const getDrugById = (id: string) => allDrugs.find(d => d.id === id);
 
   return (
     <div className="glass-panel rounded-xl p-5 space-y-5 animate-fade-in">
