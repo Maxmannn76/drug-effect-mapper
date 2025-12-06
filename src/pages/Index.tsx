@@ -4,7 +4,7 @@ import { DrugSearch } from "@/components/DrugSearch";
 import { SimilaritySlider } from "@/components/SimilaritySlider";
 import { DrugDetailsPanel } from "@/components/DrugDetailsPanel";
 import { StatsBar } from "@/components/StatsBar";
-import { ApiConnectionBanner } from "@/components/ApiConnectionBanner";
+
 import { ChatBot } from "@/components/ChatBot";
 import { useApiConnection } from "@/hooks/useApiConnection";
 import { Drug, NetworkData, DrugSimilarity } from "@/types/drug";
@@ -96,9 +96,6 @@ const Index = () => {
     }
   };
 
-  const handleApiConnect = async () => {
-    return api.connect();
-  };
 
   return (
     <div className="h-screen flex flex-col md:flex-row overflow-hidden">
@@ -117,10 +114,6 @@ const Index = () => {
             </div>
           </header>
 
-          {/* API Connection Banner */}
-          <div className="animate-fade-in-delay-1">
-            <ApiConnectionBanner isConnected={api.isConnected} onConnect={handleApiConnect} />
-          </div>
 
           {/* Main Content */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
