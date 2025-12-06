@@ -16,14 +16,14 @@ export function DrugDetailsPanel({
   similarDrugs,
   onSelectSimilar,
 }: DrugDetailsPanelProps) {
-  const { description, pubchemUrl, isLoading, error } = usePubChemDrug(drug.name);
+  const { description, pubchemUrl, isLoading, error } = usePubChemDrug(drug.drug);
 
   return (
     <div className="glass-panel rounded-xl p-5 space-y-5 animate-fade-in">
       {/* Drug Header */}
       <div className="space-y-3">
         <div className="flex items-start justify-between">
-          <h2 className="text-xl font-semibold text-gradient-primary">{drug.name}</h2>
+          <h2 className="text-xl font-semibold text-gradient-primary">{drug.drug}</h2>
           <Badge variant="secondary" className="font-mono text-xs">
             {drug.id}
           </Badge>
@@ -74,24 +74,25 @@ export function DrugDetailsPanel({
           </div>
         )}
 
-        {/* Cell Types Used for Testing */}
-        {drug.cellTypes && drug.cellTypes.length > 0 && (
+        {/* Cell Line Used for Testing */}
+        {drug.cell_line && (
           <div className="space-y-1">
             <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-              Cell Lines Tested
+              Cell Line Tested
             </span>
             <div className="flex items-center gap-2">
               <Microscope className="h-4 w-4 text-primary flex-shrink-0" />
-              <div className="flex flex-wrap gap-1">
-                {drug.cellTypes.map((ct) => (
-                  <Badge key={ct} variant="outline" className="text-xs">
-                    {ct}
-                  </Badge>
-                ))}
-              </div>
+              <Badge variant="outline" className="text-xs">
+                {drug.cell_line}
+              </Badge>
+              {drug.samples_aggregated && (
+                <span className="text-xs text-muted-foreground">
+                  ({drug.samples_aggregated} samples)
+                </span>
+              )}
             </div>
             <p className="text-xs text-muted-foreground pl-6">
-              Human cell lines used to measure this drug's effects
+              Human cell line used to measure this drug's effects
             </p>
           </div>
         )}
@@ -122,7 +123,7 @@ export function DrugDetailsPanel({
                 >
                   <div className="flex-1 text-left">
                     <div className="font-medium text-foreground group-hover:text-primary transition-colors">
-                      {similarDrug.name}
+                      {similarDrug.drug}
                     </div>
                     {similarDrug.mechanism && (
                       <div className="text-xs text-muted-foreground truncate">

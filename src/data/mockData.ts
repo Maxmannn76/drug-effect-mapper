@@ -1,22 +1,22 @@
 import { Drug, NetworkData, DrugSimilarity } from "@/types/drug";
 
-// Mock drugs with varied mechanisms for demo
+// Mock drugs with Qdrant-compatible structure
 export const mockDrugs: Drug[] = [
-  { id: "drug_001", name: "Imatinib", mechanism: "Tyrosine kinase inhibitor", cellTypes: ["K562", "MCF7"] },
-  { id: "drug_002", name: "Gefitinib", mechanism: "EGFR inhibitor", cellTypes: ["A549", "MCF7"] },
-  { id: "drug_003", name: "Metformin", mechanism: "AMPK activator", cellTypes: ["HepG2", "MCF7"] },
-  { id: "drug_004", name: "Rapamycin", mechanism: "mTOR inhibitor", cellTypes: ["HeLa", "K562"] },
-  { id: "drug_005", name: "Doxorubicin", mechanism: "Topoisomerase II inhibitor", cellTypes: ["MCF7", "HeLa"] },
-  { id: "drug_006", name: "Paclitaxel", mechanism: "Microtubule stabilizer", cellTypes: ["A549", "MCF7"] },
-  { id: "drug_007", name: "Vorinostat", mechanism: "HDAC inhibitor", cellTypes: ["K562", "HeLa"] },
-  { id: "drug_008", name: "Erlotinib", mechanism: "EGFR inhibitor", cellTypes: ["A549", "HepG2"] },
-  { id: "drug_009", name: "Sorafenib", mechanism: "Multi-kinase inhibitor", cellTypes: ["HepG2", "K562"] },
-  { id: "drug_010", name: "Lapatinib", mechanism: "HER2/EGFR inhibitor", cellTypes: ["MCF7", "A549"] },
-  { id: "drug_011", name: "Nilotinib", mechanism: "Tyrosine kinase inhibitor", cellTypes: ["K562", "HeLa"] },
-  { id: "drug_012", name: "Dasatinib", mechanism: "Tyrosine kinase inhibitor", cellTypes: ["K562", "MCF7"] },
-  { id: "drug_013", name: "Temsirolimus", mechanism: "mTOR inhibitor", cellTypes: ["HeLa", "A549"] },
-  { id: "drug_014", name: "Everolimus", mechanism: "mTOR inhibitor", cellTypes: ["MCF7", "HepG2"] },
-  { id: "drug_015", name: "Belinostat", mechanism: "HDAC inhibitor", cellTypes: ["K562", "A549"] },
+  { id: "drug_001", drug: "Imatinib", cell_line: "CVCL_0023", mechanism: "Tyrosine kinase inhibitor", samples_aggregated: 450 },
+  { id: "drug_002", drug: "Gefitinib", cell_line: "CVCL_0023", mechanism: "EGFR inhibitor", samples_aggregated: 380 },
+  { id: "drug_003", drug: "Metformin", cell_line: "CVCL_0023", mechanism: "AMPK activator", samples_aggregated: 520 },
+  { id: "drug_004", drug: "Rapamycin", cell_line: "CVCL_0023", mechanism: "mTOR inhibitor", samples_aggregated: 290 },
+  { id: "drug_005", drug: "Doxorubicin", cell_line: "CVCL_0023", mechanism: "Topoisomerase II inhibitor", samples_aggregated: 410 },
+  { id: "drug_006", drug: "Paclitaxel", cell_line: "CVCL_0023", mechanism: "Microtubule stabilizer", samples_aggregated: 350 },
+  { id: "drug_007", drug: "Vorinostat", cell_line: "CVCL_0023", mechanism: "HDAC inhibitor", samples_aggregated: 280 },
+  { id: "drug_008", drug: "Erlotinib", cell_line: "CVCL_0023", mechanism: "EGFR inhibitor", samples_aggregated: 390 },
+  { id: "drug_009", drug: "Sorafenib", cell_line: "CVCL_0023", mechanism: "Multi-kinase inhibitor", samples_aggregated: 310 },
+  { id: "drug_010", drug: "Lapatinib", cell_line: "CVCL_0023", mechanism: "HER2/EGFR inhibitor", samples_aggregated: 420 },
+  { id: "drug_011", drug: "Nilotinib", cell_line: "CVCL_0023", mechanism: "Tyrosine kinase inhibitor", samples_aggregated: 340 },
+  { id: "drug_012", drug: "Dasatinib", cell_line: "CVCL_0023", mechanism: "Tyrosine kinase inhibitor", samples_aggregated: 370 },
+  { id: "drug_013", drug: "Temsirolimus", cell_line: "CVCL_0023", mechanism: "mTOR inhibitor", samples_aggregated: 260 },
+  { id: "drug_014", drug: "Everolimus", cell_line: "CVCL_0023", mechanism: "mTOR inhibitor", samples_aggregated: 330 },
+  { id: "drug_015", drug: "Belinostat", cell_line: "CVCL_0023", mechanism: "HDAC inhibitor", samples_aggregated: 240 },
 ];
 
 // Pre-computed similarity matrix (cosine similarities between delta embeddings)
@@ -53,7 +53,8 @@ export function generateNetworkData(threshold: number = 0.5): NetworkData {
     const radius = 300;
     return {
       id: drug.id,
-      name: drug.name,
+      drug: drug.drug,
+      cell_line: drug.cell_line,
       x: 400 + radius * Math.cos(angle),
       y: 350 + radius * Math.sin(angle),
       size: 20,
