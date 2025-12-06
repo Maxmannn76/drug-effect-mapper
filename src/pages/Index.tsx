@@ -120,7 +120,7 @@ const Index = () => {
               </div>
               <div className="hidden sm:block h-10 w-px bg-border/50" />
               <p className="hidden sm:block text-sm text-muted-foreground max-w-xs">
-                Discover drugs with similar cellular responses via Tahoe-x1 embeddings
+                Find drugs with similar cellular responses
               </p>
             </div>
           </header>
@@ -172,6 +172,9 @@ const Index = () => {
                 onSelectNode={handleSelectNode}
                 className="h-[500px] md:h-[600px] lg:h-[700px]"
               />
+              <p className="text-xs text-muted-foreground text-center mt-2">
+                Drug similarities computed via Tahoe-x1 embeddings
+              </p>
             </div>
           </div>
 
