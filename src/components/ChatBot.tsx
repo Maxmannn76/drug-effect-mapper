@@ -5,6 +5,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Send, Bot, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { Drug, DrugSimilarity } from "@/types/drug";
 
 interface Message {
   id: string;
@@ -13,16 +14,23 @@ interface Message {
   timestamp: Date;
 }
 
+interface ChatBotProps {
+  selectedDrug?: Drug | null;
+  similarDrugs?: DrugSimilarity[];
+  allDrugs?: Drug[];
+  threshold?: number;
+}
+
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/drug-chat`;
 
 const WELCOME_MESSAGE: Message = {
   id: "welcome",
   role: "assistant",
-  content: "Hello! I'm your drug repurposing assistant. Ask me about drug similarities, mechanisms of action, or how to interpret the network visualization.",
+  content: "Hello! I'm Elix, your drug repurposing assistant. Select a drug from the network and ask me about its similarities, mechanism, or potential repurposing opportunities.",
   timestamp: new Date(),
 };
 
-export const ChatBot = () => {
+export const ChatBot = ({ selectedDrug, similarDrugs, allDrugs, threshold }: ChatBotProps) => {
   const [messages, setMessages] = useState<Message[]>([WELCOME_MESSAGE]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -112,12 +120,32 @@ export const ChatBot = () => {
     let assistantContent = "";
 
     try {
+      // Build context object with dashboard state
+      const context = selectedDrug ? {
+        selectedDrug: {
+          id: selectedDrug.id,
+          drug: selectedDrug.drug,
+          mechanism: selectedDrug.mechanism,
+          cell_line: selectedDrug.cell_line,
+          samples_aggregated: selectedDrug.samples_aggregated,
+        },
+        similarDrugs: similarDrugs?.map(sd => {
+          const drugInfo = allDrugs?.find(d => d.id === sd.drugId);
+          return {
+            drugId: sd.drugId,
+            drugName: drugInfo?.drug,
+            similarity: sd.similarity,
+          };
+        }),
+        threshold,
+      } : undefined;
+
       const response = await fetch(CHAT_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ messages: chatMessages }),
+        body: JSON.stringify({ messages: chatMessages, context }),
       });
 
       if (!response.ok) {
