@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, Bot, User, Trash2 } from "lucide-react";
+import { Send, Bot, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -213,34 +213,33 @@ export const ChatBot = () => {
   };
 
   return (
-    <div className="flex flex-col h-full glass-panel rounded-xl overflow-hidden">
+    <div className="flex flex-col h-full glass-panel rounded-xl overflow-hidden min-h-0">
       {/* Header */}
-      <div className="p-4 border-b border-border/50 bg-card/50">
+      <div className="p-3 border-b border-border/50 bg-card/50 shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-              <Bot className="h-4 w-4 text-primary-foreground" />
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+              <Bot className="h-3.5 w-3.5 text-primary-foreground" />
             </div>
             <div>
               <h3 className="text-sm font-semibold">Research Assistant</h3>
-              <p className="text-xs text-muted-foreground">Powered by AI</p>
             </div>
           </div>
           <Button
             variant="ghost"
             size="icon"
             onClick={clearHistory}
-            className="h-8 w-8 text-muted-foreground hover:text-destructive"
+            className="h-7 w-7 text-muted-foreground hover:text-destructive"
             title="Clear chat history"
           >
-            <Trash2 className="h-4 w-4" />
+            <Trash2 className="h-3.5 w-3.5" />
           </Button>
         </div>
       </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1 p-4" ref={scrollRef}>
-        <div className="space-y-4">
+      <ScrollArea className="flex-1 min-h-0 p-3" ref={scrollRef}>
+        <div className="space-y-3">
           {isLoadingHistory && (
             <div className="text-center text-muted-foreground text-sm py-2">
               Loading chat history...
@@ -249,25 +248,10 @@ export const ChatBot = () => {
           {messages.map((message) => (
             <div
               key={message.id}
-              className={`flex gap-3 ${
-                message.role === "user" ? "flex-row-reverse" : ""
-              }`}
+              className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
             >
               <div
-                className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${
-                  message.role === "user"
-                    ? "bg-primary/20"
-                    : "bg-accent/20"
-                }`}
-              >
-                {message.role === "user" ? (
-                  <User className="h-3.5 w-3.5 text-primary" />
-                ) : (
-                  <Bot className="h-3.5 w-3.5 text-accent" />
-                )}
-              </div>
-              <div
-                className={`max-w-[80%] rounded-xl px-3 py-2 text-sm ${
+                className={`max-w-[90%] rounded-xl px-3 py-2 text-sm ${
                   message.role === "user"
                     ? "bg-primary/20 text-foreground"
                     : "bg-muted/50 text-foreground"
@@ -278,10 +262,7 @@ export const ChatBot = () => {
             </div>
           ))}
           {isLoading && !messages.some(m => m.id.startsWith("stream-")) && (
-            <div className="flex gap-3">
-              <div className="w-7 h-7 rounded-full bg-accent/20 flex items-center justify-center">
-                <Bot className="h-3.5 w-3.5 text-accent" />
-              </div>
+            <div className="flex justify-start">
               <div className="bg-muted/50 rounded-xl px-3 py-2">
                 <div className="flex gap-1">
                   <span className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />

@@ -31,13 +31,13 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: `You are a drug repurposing research assistant. You help researchers understand:
-- Drug similarity networks and what connections mean
-- Mechanisms of action (MoA) and how similar cellular responses can indicate repurposing opportunities
-- How to interpret Tahoe-x1 delta embeddings and cosine similarity scores
-- Drug repurposing concepts and methodology
+            content: `You are a drug repurposing research assistant. Be VERY CONCISE - aim for 2-3 sentences max unless asked for details. Help with:
+- Drug similarity networks
+- Mechanisms of action (MoA)  
+- Tahoe-x1 embeddings and cosine similarity
+- Drug repurposing concepts
 
-Be concise, scientific, and helpful. When discussing specific drugs, explain their known mechanisms and potential repurposing candidates. If you don't know something specific, acknowledge it and provide general guidance.`
+Short, direct answers. No lengthy explanations unless specifically requested.`
           },
           ...messages,
         ],
