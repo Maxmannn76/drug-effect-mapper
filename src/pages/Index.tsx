@@ -117,9 +117,9 @@ const Index = () => {
           {/* Main Content */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left Panel: Search + Drug Details */}
-            <div className="space-y-4 animate-fade-in-delay-2 lg:max-h-[calc(100vh-200px)] lg:overflow-auto">
+            <div className="flex flex-col gap-4 animate-fade-in-delay-2 lg:h-[calc(100vh-200px)]">
               {/* Search */}
-              <div className="glass-panel rounded-xl p-4 space-y-4">
+              <div className="glass-panel rounded-xl p-4 space-y-4 shrink-0">
                 <h3 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                   <Share2 className="h-4 w-4" />
                   Query Drug
@@ -132,7 +132,7 @@ const Index = () => {
               </div>
 
               {/* Drug Details */}
-              <div className="animate-fade-in-delay-3 max-h-[400px] overflow-auto">
+              <div className="animate-fade-in-delay-3 flex-1 min-h-0 overflow-auto">
                 {selectedDrug ? (
                   <DrugDetailsPanel
                     drug={selectedDrug}
