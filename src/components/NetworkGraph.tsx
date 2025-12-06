@@ -165,9 +165,9 @@ export function NetworkGraph({
 
     const similarity = similarityMap.get(nodeId);
     if (similarity !== undefined) {
-      // Blue color with varying lightness based on similarity
-      const lightness = 45 + similarity * 25;
-      return `hsl(210 90% ${lightness}%)`;
+      // Soft blue color (#B0C4E3 base) with varying lightness based on similarity
+      const lightness = 55 + similarity * 25;
+      return `hsl(216 50% ${lightness}%)`;
     }
 
     return "hsl(var(--node-default))";
