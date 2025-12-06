@@ -15,7 +15,7 @@
     --popover: 160 18% 9%;
     --popover-foreground: 150 20% 95%;
 
-    --primary: 145 70% 45%;
+    --primary: 142 76% 56%;
     --primary-foreground: 160 20% 6%;
 
     --secondary: 160 15% 14%;
@@ -24,7 +24,7 @@
     --muted: 160 15% 17%;
     --muted-foreground: 155 15% 55%;
 
-    --accent: 165 60% 55%;
+    --accent: 158 70% 60%;
     --accent-foreground: 160 20% 6%;
 
     --destructive: 0 70% 55%;
@@ -32,32 +32,32 @@
 
     --border: 160 15% 18%;
     --input: 160 15% 16%;
-    --ring: 145 70% 45%;
+    --ring: 142 76% 56%;
 
     --radius: 0.75rem;
 
     /* Custom tokens */
-    --glow-primary: 145 70% 45%;
-    --glow-accent: 165 60% 55%;
-    --node-default: 155 50% 45%;
-    --node-selected: 145 70% 55%;
-    --node-hover: 140 80% 65%;
+    --glow-primary: 142 76% 56%;
+    --glow-accent: 158 70% 60%;
+    --node-default: 150 60% 50%;
+    --node-selected: 142 76% 60%;
+    --node-hover: 138 80% 70%;
     --edge-default: 160 20% 28%;
-    --edge-active: 145 65% 42%;
+    --edge-active: 142 70% 50%;
     --surface-elevated: 160 18% 11%;
 
-    --gradient-mesh: radial-gradient(at 20% 80%, hsl(145 70% 45% / 0.08) 0%, transparent 50%),
-                     radial-gradient(at 80% 20%, hsl(165 60% 55% / 0.06) 0%, transparent 50%),
+    --gradient-mesh: radial-gradient(at 20% 80%, hsl(142 76% 56% / 0.1) 0%, transparent 50%),
+                     radial-gradient(at 80% 20%, hsl(158 70% 60% / 0.08) 0%, transparent 50%),
                      radial-gradient(at 50% 50%, hsl(160 20% 6%) 0%, hsl(160 20% 4%) 100%);
 
     --sidebar-background: 160 18% 7%;
     --sidebar-foreground: 150 20% 90%;
-    --sidebar-primary: 145 70% 45%;
+    --sidebar-primary: 142 76% 56%;
     --sidebar-primary-foreground: 160 20% 6%;
     --sidebar-accent: 160 15% 14%;
     --sidebar-accent-foreground: 150 20% 90%;
     --sidebar-border: 160 15% 16%;
-    --sidebar-ring: 145 70% 45%;
+    --sidebar-ring: 142 76% 56%;
   }
 
   .dark {
