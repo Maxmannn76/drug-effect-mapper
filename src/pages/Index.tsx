@@ -117,7 +117,7 @@ const Index = () => {
           {/* Main Content */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left Panel: Search + Drug Details */}
-            <div className="space-y-4 animate-fade-in-delay-2">
+            <div className="space-y-4 animate-fade-in-delay-2 lg:max-h-[calc(100vh-200px)] lg:overflow-auto">
               {/* Search */}
               <div className="glass-panel rounded-xl p-4 space-y-4">
                 <h3 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
@@ -132,7 +132,7 @@ const Index = () => {
               </div>
 
               {/* Drug Details */}
-              <div className="animate-fade-in-delay-3">
+              <div className="animate-fade-in-delay-3 max-h-[400px] overflow-auto">
                 {selectedDrug ? (
                   <DrugDetailsPanel
                     drug={selectedDrug}
