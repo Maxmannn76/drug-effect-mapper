@@ -103,14 +103,18 @@ export function NetworkGraph({
     return nodes.filter((node) => connectedIds.has(node.id));
   }, [selectedNodeId, connectedEdges, nodes]);
 
-  // Filter edges to show only those connected to selected node
+  // Create a set of valid node IDs for quick lookup
+  const nodeIdSet = useMemo(() => new Set(nodes.map(n => n.id)), [nodes]);
+
+  // Filter edges to show only those connected to selected node AND where both nodes exist
   const visibleEdges = useMemo(() => {
-    if (!selectedNodeId) return edges;
+    const baseEdges = selectedNodeId 
+      ? edges.filter((edge) => edge.source === selectedNodeId || edge.target === selectedNodeId)
+      : edges;
     
-    return edges.filter(
-      (edge) => edge.source === selectedNodeId || edge.target === selectedNodeId
-    );
-  }, [selectedNodeId, edges]);
+    // Only include edges where both source and target nodes exist
+    return baseEdges.filter((edge) => nodeIdSet.has(edge.source) && nodeIdSet.has(edge.target));
+  }, [selectedNodeId, edges, nodeIdSet]);
 
   const handleWheel = useCallback((e: WheelEvent) => {
     e.preventDefault();
