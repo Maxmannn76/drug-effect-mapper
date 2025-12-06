@@ -1,8 +1,9 @@
 import { Drug, DrugSimilarity } from "@/types/drug";
-import { getDrugById, mockDrugs } from "@/data/mockData";
+import { getDrugById } from "@/data/mockData";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { ArrowRight, Dna, FlaskConical, Microscope } from "lucide-react";
+import { ArrowRight, Dna, FlaskConical, Microscope, ExternalLink, Loader2 } from "lucide-react";
+import { usePubChemDrug } from "@/hooks/usePubChemDrug";
 
 interface DrugDetailsPanelProps {
   drug: Drug;
@@ -15,6 +16,8 @@ export function DrugDetailsPanel({
   similarDrugs,
   onSelectSimilar,
 }: DrugDetailsPanelProps) {
+  const { description, pubchemUrl, isLoading, error } = usePubChemDrug(drug.name);
+
   return (
     <div className="glass-panel rounded-xl p-5 space-y-5 animate-fade-in">
       {/* Drug Header */}
@@ -26,23 +29,70 @@ export function DrugDetailsPanel({
           </Badge>
         </div>
 
+        {/* Drug Description from PubChem */}
+        <div className="space-y-2">
+          {isLoading ? (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span>Loading drug information...</span>
+            </div>
+          ) : description ? (
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              {description}
+            </p>
+          ) : error ? (
+            <p className="text-sm text-muted-foreground italic">
+              Could not load description from PubChem.
+            </p>
+          ) : null}
+          
+          {/* PubChem Link */}
+          <a
+            href={pubchemUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 transition-colors"
+          >
+            <ExternalLink className="h-3 w-3" />
+            View on PubChem
+          </a>
+        </div>
+
+        {/* Mechanism of Action */}
         {drug.mechanism && (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <FlaskConical className="h-4 w-4 text-primary" />
-            <span>{drug.mechanism}</span>
+          <div className="space-y-1">
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+              Mechanism of Action (MoA)
+            </span>
+            <div className="flex items-center gap-2 text-sm">
+              <FlaskConical className="h-4 w-4 text-primary flex-shrink-0" />
+              <span className="text-foreground">{drug.mechanism}</span>
+            </div>
+            <p className="text-xs text-muted-foreground pl-6">
+              How this drug works at the molecular level
+            </p>
           </div>
         )}
 
+        {/* Cell Types Used for Testing */}
         {drug.cellTypes && drug.cellTypes.length > 0 && (
-          <div className="flex items-center gap-2">
-            <Microscope className="h-4 w-4 text-primary" />
-            <div className="flex flex-wrap gap-1">
-              {drug.cellTypes.map((ct) => (
-                <Badge key={ct} variant="outline" className="text-xs">
-                  {ct}
-                </Badge>
-              ))}
+          <div className="space-y-1">
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+              Cell Lines Tested
+            </span>
+            <div className="flex items-center gap-2">
+              <Microscope className="h-4 w-4 text-primary flex-shrink-0" />
+              <div className="flex flex-wrap gap-1">
+                {drug.cellTypes.map((ct) => (
+                  <Badge key={ct} variant="outline" className="text-xs">
+                    {ct}
+                  </Badge>
+                ))}
+              </div>
             </div>
+            <p className="text-xs text-muted-foreground pl-6">
+              Human cell lines used to measure this drug's effects
+            </p>
           </div>
         )}
       </div>
