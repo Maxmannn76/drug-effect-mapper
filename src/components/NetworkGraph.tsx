@@ -9,6 +9,11 @@ interface NetworkGraphProps {
   className?: string;
 }
 
+const CENTER_X = 400;
+const CENTER_Y = 350;
+const MAX_RADIUS = 280;
+const MIN_RADIUS = 80;
+
 export function NetworkGraph({
   data,
   selectedNodeId,
@@ -21,35 +26,77 @@ export function NetworkGraph({
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
-  // Calculate similarity scores for all nodes relative to selected node
-  const similarityMap = useMemo(() => {
+  // Calculate connected nodes and their similarities when a node is selected
+  const { connectedEdges, similarityMap } = useMemo(() => {
+    const edges: { nodeId: string; similarity: number }[] = [];
     const map = new Map<string, number>();
-    if (!selectedNodeId) return map;
 
-    // Set selected node similarity to 1
-    map.set(selectedNodeId, 1);
+    if (!selectedNodeId) return { connectedEdges: edges, similarityMap: map };
 
-    // Find direct connections and their similarities
     data.edges.forEach((edge) => {
       if (edge.source === selectedNodeId) {
+        edges.push({ nodeId: edge.target, similarity: edge.similarity });
         map.set(edge.target, edge.similarity);
       }
       if (edge.target === selectedNodeId) {
+        edges.push({ nodeId: edge.source, similarity: edge.similarity });
         map.set(edge.source, edge.similarity);
       }
     });
 
-    return map;
+    // Sort by similarity descending
+    edges.sort((a, b) => b.similarity - a.similarity);
+
+    return { connectedEdges: edges, similarityMap: map };
   }, [selectedNodeId, data.edges]);
 
-  const connectedNodes = new Set<string>();
-  if (selectedNodeId) {
-    connectedNodes.add(selectedNodeId);
-    data.edges.forEach((edge) => {
-      if (edge.source === selectedNodeId) connectedNodes.add(edge.target);
-      if (edge.target === selectedNodeId) connectedNodes.add(edge.source);
+  // Calculate positions: selected node in center, connected nodes arranged by similarity
+  const nodePositions = useMemo(() => {
+    const positions = new Map<string, { x: number; y: number }>();
+
+    if (!selectedNodeId) {
+      // No selection: use original positions
+      data.nodes.forEach((node) => {
+        positions.set(node.id, { x: node.x || 0, y: node.y || 0 });
+      });
+      return positions;
+    }
+
+    // Selected node at center
+    positions.set(selectedNodeId, { x: CENTER_X, y: CENTER_Y });
+
+    // Arrange connected nodes in a circle, distance based on similarity
+    const count = connectedEdges.length;
+    connectedEdges.forEach((edge, index) => {
+      const angle = (2 * Math.PI * index) / count - Math.PI / 2; // Start from top
+      // Higher similarity = closer to center
+      const distance = MIN_RADIUS + (1 - edge.similarity) * (MAX_RADIUS - MIN_RADIUS);
+      const x = CENTER_X + Math.cos(angle) * distance;
+      const y = CENTER_Y + Math.sin(angle) * distance;
+      positions.set(edge.nodeId, { x, y });
     });
-  }
+
+    return positions;
+  }, [selectedNodeId, connectedEdges, data.nodes]);
+
+  // Filter nodes to show only selected + connected when a drug is selected
+  const visibleNodes = useMemo(() => {
+    if (!selectedNodeId) return data.nodes;
+    
+    const connectedIds = new Set(connectedEdges.map((e) => e.nodeId));
+    connectedIds.add(selectedNodeId);
+    
+    return data.nodes.filter((node) => connectedIds.has(node.id));
+  }, [selectedNodeId, connectedEdges, data.nodes]);
+
+  // Filter edges to show only those connected to selected node
+  const visibleEdges = useMemo(() => {
+    if (!selectedNodeId) return data.edges;
+    
+    return data.edges.filter(
+      (edge) => edge.source === selectedNodeId || edge.target === selectedNodeId
+    );
+  }, [selectedNodeId, data.edges]);
 
   const handleWheel = useCallback((e: WheelEvent) => {
     e.preventDefault();
@@ -89,75 +136,34 @@ export function NetworkGraph({
     }
   }, [handleWheel]);
 
+  // Reset transform when selection changes
+  useEffect(() => {
+    setTransform({ x: 0, y: 0, scale: 1 });
+  }, [selectedNodeId]);
+
   const getNodeColor = (nodeId: string) => {
     if (nodeId === selectedNodeId) return "hsl(var(--node-selected))";
     if (nodeId === hoveredNode) return "hsl(var(--node-hover))";
-    
-    // If a node is selected, color based on similarity
-    if (selectedNodeId) {
-      const similarity = similarityMap.get(nodeId);
-      if (similarity !== undefined) {
-        // Interpolate between primary color with varying lightness
-        const lightness = 40 + similarity * 30; // 40-70% lightness based on similarity
-        return `hsl(135 90% ${lightness}%)`;
-      }
-      // Not connected
-      return "hsl(var(--muted-foreground) / 0.2)";
+
+    const similarity = similarityMap.get(nodeId);
+    if (similarity !== undefined) {
+      const lightness = 40 + similarity * 30;
+      return `hsl(135 90% ${lightness}%)`;
     }
-    
+
     return "hsl(var(--node-default))";
   };
 
   const getNodeSize = (nodeId: string) => {
-    if (nodeId === selectedNodeId) return 28;
-    if (nodeId === hoveredNode) return 24;
-    
-    if (selectedNodeId) {
-      const similarity = similarityMap.get(nodeId);
-      if (similarity !== undefined) {
-        // Size ranges from 14 to 24 based on similarity
-        return 14 + similarity * 10;
-      }
-      return 10; // Not connected nodes are smaller
-    }
-    
-    return 18;
-  };
+    if (nodeId === selectedNodeId) return 32;
+    if (nodeId === hoveredNode) return 26;
 
-  const getNodeOpacity = (nodeId: string) => {
-    if (!selectedNodeId) return 1;
-    if (nodeId === selectedNodeId) return 1;
-    
     const similarity = similarityMap.get(nodeId);
     if (similarity !== undefined) {
-      // Opacity ranges from 0.5 to 1 based on similarity
-      return 0.5 + similarity * 0.5;
+      return 14 + similarity * 12;
     }
-    return 0.15; // Not connected
-  };
 
-  const getEdgeColor = (edge: { source: string; target: string }) => {
-    if (selectedNodeId && (edge.source === selectedNodeId || edge.target === selectedNodeId)) {
-      return "hsl(var(--edge-active))";
-    }
-    if (selectedNodeId) return "hsl(var(--edge-default) / 0.1)";
-    return "hsl(var(--edge-default))";
-  };
-
-  const getEdgeWidth = (edge: { source: string; target: string; similarity: number }) => {
-    const base = edge.similarity * 3;
-    if (selectedNodeId && (edge.source === selectedNodeId || edge.target === selectedNodeId)) {
-      return base + 2;
-    }
-    return base;
-  };
-
-  const getEdgeOpacity = (edge: { source: string; target: string; similarity: number }) => {
-    if (!selectedNodeId) return 0.6;
-    if (edge.source === selectedNodeId || edge.target === selectedNodeId) {
-      return 0.4 + edge.similarity * 0.6; // Brighter for higher similarity
-    }
-    return 0.1;
+    return 18;
   };
 
   return (
@@ -177,7 +183,7 @@ export function NetworkGraph({
             <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0" />
           </radialGradient>
           <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+            <feGaussianBlur stdDeviation="4" result="coloredBlur" />
             <feMerge>
               <feMergeNode in="coloredBlur" />
               <feMergeNode in="SourceGraphic" />
@@ -186,25 +192,43 @@ export function NetworkGraph({
         </defs>
 
         <g transform={`translate(${transform.x}, ${transform.y}) scale(${transform.scale})`}>
+          {/* Distance circles when node is selected */}
+          {selectedNodeId && (
+            <g opacity="0.15">
+              {[0.25, 0.5, 0.75, 1].map((ratio, i) => (
+                <circle
+                  key={i}
+                  cx={CENTER_X}
+                  cy={CENTER_Y}
+                  r={MIN_RADIUS + ratio * (MAX_RADIUS - MIN_RADIUS)}
+                  fill="none"
+                  stroke="hsl(var(--primary))"
+                  strokeWidth="1"
+                  strokeDasharray="4 4"
+                />
+              ))}
+            </g>
+          )}
+
           {/* Edges */}
           <g>
-            {data.edges.map((edge, i) => {
-              const sourceNode = data.nodes.find((n) => n.id === edge.source);
-              const targetNode = data.nodes.find((n) => n.id === edge.target);
-              if (!sourceNode || !targetNode) return null;
+            {visibleEdges.map((edge, i) => {
+              const sourcePos = nodePositions.get(edge.source);
+              const targetPos = nodePositions.get(edge.target);
+              if (!sourcePos || !targetPos) return null;
 
               return (
-                  <line
+                <line
                   key={i}
-                  x1={sourceNode.x}
-                  y1={sourceNode.y}
-                  x2={targetNode.x}
-                  y2={targetNode.y}
-                  stroke={getEdgeColor(edge)}
-                  strokeWidth={getEdgeWidth(edge)}
+                  x1={sourcePos.x}
+                  y1={sourcePos.y}
+                  x2={targetPos.x}
+                  y2={targetPos.y}
+                  stroke="hsl(var(--edge-active))"
+                  strokeWidth={1 + edge.similarity * 3}
                   strokeLinecap="round"
-                  opacity={getEdgeOpacity(edge)}
-                  className="transition-all duration-300"
+                  opacity={0.4 + edge.similarity * 0.5}
+                  className="transition-all duration-500"
                 />
               );
             })}
@@ -212,28 +236,29 @@ export function NetworkGraph({
 
           {/* Nodes */}
           <g>
-            {data.nodes.map((node) => {
+            {visibleNodes.map((node) => {
               const isSelected = node.id === selectedNodeId;
+              const pos = nodePositions.get(node.id);
+              if (!pos) return null;
+
               const nodeSize = getNodeSize(node.id);
-              const nodeOpacity = getNodeOpacity(node.id);
               const similarity = similarityMap.get(node.id);
 
               return (
                 <g
                   key={node.id}
-                  transform={`translate(${node.x}, ${node.y})`}
+                  transform={`translate(${pos.x}, ${pos.y})`}
                   onClick={(e) => {
                     e.stopPropagation();
                     onSelectNode(node.id === selectedNodeId ? null : node.id);
                   }}
                   onMouseEnter={() => setHoveredNode(node.id)}
                   onMouseLeave={() => setHoveredNode(null)}
-                  className="cursor-pointer"
-                  style={{ opacity: nodeOpacity, transition: "opacity 0.3s" }}
+                  className="cursor-pointer transition-transform duration-500"
                 >
                   {/* Glow effect for selected/hovered */}
                   {(isSelected || node.id === hoveredNode) && (
-                    <circle r={nodeSize + 15} fill="url(#nodeGlow)" className="animate-network-pulse" />
+                    <circle r={nodeSize + 18} fill="url(#nodeGlow)" className="animate-network-pulse" />
                   )}
 
                   {/* Main node */}
@@ -244,12 +269,12 @@ export function NetworkGraph({
                     className="transition-all duration-300"
                   />
 
-                  {/* Similarity label for connected nodes */}
-                  {selectedNodeId && similarity !== undefined && similarity < 1 && (
+                  {/* Similarity label */}
+                  {!isSelected && similarity !== undefined && (
                     <text
-                      y={-nodeSize - 6}
+                      y={-nodeSize - 8}
                       textAnchor="middle"
-                      className="text-[10px] font-mono fill-primary pointer-events-none select-none"
+                      className="text-[11px] font-mono fill-primary pointer-events-none select-none font-semibold"
                     >
                       {(similarity * 100).toFixed(0)}%
                     </text>
@@ -257,9 +282,12 @@ export function NetworkGraph({
 
                   {/* Node label */}
                   <text
-                    y={nodeSize + 14}
+                    y={nodeSize + 16}
                     textAnchor="middle"
-                    className="text-xs font-medium fill-foreground pointer-events-none select-none"
+                    className={cn(
+                      "text-xs font-medium pointer-events-none select-none",
+                      isSelected ? "fill-primary font-semibold" : "fill-foreground"
+                    )}
                   >
                     {node.name}
                   </text>
@@ -285,7 +313,10 @@ export function NetworkGraph({
           −
         </button>
         <button
-          onClick={() => setTransform({ x: 0, y: 0, scale: 1 })}
+          onClick={() => {
+            onSelectNode(null);
+            setTransform({ x: 0, y: 0, scale: 1 });
+          }}
           className="px-3 h-8 rounded-md bg-card/80 border border-border text-foreground hover:bg-card text-xs font-medium transition-colors"
         >
           Reset
@@ -294,7 +325,9 @@ export function NetworkGraph({
 
       {/* Instructions */}
       <div className="absolute top-4 left-4 text-xs text-muted-foreground">
-        Click nodes to explore • Scroll to zoom • Drag to pan
+        {selectedNodeId 
+          ? "Closer = more similar • Click drug to explore • Click Reset to clear"
+          : "Select a drug to explore similarities"}
       </div>
     </div>
   );
