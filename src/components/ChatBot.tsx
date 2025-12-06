@@ -222,7 +222,7 @@ export const ChatBot = () => {
               <Bot className="h-3.5 w-3.5 text-primary-foreground" />
             </div>
             <div>
-              <h3 className="text-sm font-semibold">Research Assistant</h3>
+              <h3 className="text-sm font-semibold">Ask Elix</h3>
             </div>
           </div>
           <Button
