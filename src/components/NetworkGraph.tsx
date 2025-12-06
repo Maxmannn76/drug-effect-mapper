@@ -11,8 +11,8 @@ interface NetworkGraphProps {
 
 const CENTER_X = 400;
 const CENTER_Y = 350;
-const MAX_RADIUS = 280;
-const MIN_RADIUS = 80;
+const MAX_RADIUS = 320;  // Far away = low similarity
+const MIN_RADIUS = 50;   // Close = high similarity
 
 export function NetworkGraph({
   data,
