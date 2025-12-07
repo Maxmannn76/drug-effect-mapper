@@ -101,28 +101,28 @@ const Index = () => {
   };
   return <div className="h-screen flex flex-col md:flex-row overflow-hidden">
       {/* Main Dashboard */}
-      <div className="flex-1 p-4 md:p-6 lg:p-8 overflow-auto">
-        <div className="max-w-[1400px] mx-auto space-y-6">
+      <div className="flex-1 p-4 md:p-6 lg:p-8 flex flex-col overflow-hidden">
+        <div className="max-w-[1400px] mx-auto flex flex-col flex-1 min-h-0">
           {/* Header */}
-          <header className="space-y-2 animate-fade-in">
+          <header className="shrink-0 mb-4 animate-fade-in">
             <div className="flex items-center gap-4">
               {/* ELIX Logo */}
-              <img alt="ELIX" className="h-16 md:h-20 w-auto" src="/lovable-uploads/f4b9e90f-f6e3-4cf7-9330-15500e042d0c.png" />
-              <div className="hidden sm:block h-10 w-px bg-border/50" />
+              <img alt="ELIX" className="h-12 md:h-16 w-auto" src="/lovable-uploads/f4b9e90f-f6e3-4cf7-9330-15500e042d0c.png" />
+              <div className="hidden sm:block h-8 w-px bg-border/50" />
               <div className="hidden sm:block">
                 <p className="text-sm text-muted-foreground max-w-xs">
                   Find drugs with similar cellular responses
                 </p>
-                <p className="text-xs text-muted-foreground/70 mt-1">Target cell line: A549 (human lung cancer)<span className="font-medium text-primary">A549</span> (human lung carcinoma)
+                <p className="text-xs text-muted-foreground/70">Target cell line: <span className="font-medium text-primary">A549</span> (human lung carcinoma)
                 </p>
               </div>
             </div>
           </header>
 
           {/* Main Content */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 flex-1 min-h-0">
             {/* Left Panel: Search + Drug Details */}
-            <div className="flex flex-col gap-4 animate-fade-in-delay-2 lg:h-[calc(100vh-140px)]">
+            <div className="flex flex-col gap-3 animate-fade-in-delay-2 min-h-0">
               {/* Search */}
               <div className="glass-panel rounded-xl p-4 space-y-4 shrink-0">
                 <h3 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
@@ -141,12 +141,12 @@ const Index = () => {
             </div>
 
             {/* Center Panel: Network Graph */}
-            <div className="lg:col-span-2 animate-fade-in-delay-3 relative">
+            <div className="lg:col-span-2 animate-fade-in-delay-3 relative flex flex-col min-h-0">
               {isLoadingNetwork && <div className="absolute inset-0 flex items-center justify-center bg-background/50 z-10 rounded-xl">
                   <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full" />
                 </div>}
-              <NetworkGraph data={networkData} selectedNodeId={selectedNodeId} onSelectNode={handleSelectNode} className="h-[500px] md:h-[600px] lg:h-[700px]" />
-              <p className="text-xs text-muted-foreground text-center mt-2">
+              <NetworkGraph data={networkData} selectedNodeId={selectedNodeId} onSelectNode={handleSelectNode} className="flex-1 min-h-0" />
+              <p className="text-xs text-muted-foreground text-center mt-2 shrink-0">
                 Drug similarities computed via Tahoe-x1 embeddings
               </p>
             </div>
