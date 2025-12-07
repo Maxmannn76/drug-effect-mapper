@@ -122,7 +122,7 @@ const Index = () => {
           {/* Main Content */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left Panel: Search + Drug Details */}
-            <div className="flex flex-col gap-4 animate-fade-in-delay-2 lg:h-[calc(100vh-200px)]">
+            <div className="flex flex-col gap-4 animate-fade-in-delay-2 lg:h-[calc(100vh-140px)]">
               {/* Search */}
               <div className="glass-panel rounded-xl p-4 space-y-4 shrink-0">
                 <h3 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
