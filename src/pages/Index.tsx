@@ -115,9 +115,14 @@ const Index = () => {
               {/* ELIX Logo */}
               <img src={elixLogo} alt="ELIX" className="h-16 md:h-20 w-auto" />
               <div className="hidden sm:block h-10 w-px bg-border/50" />
-              <p className="hidden sm:block text-sm text-muted-foreground max-w-xs">
-                Find drugs with similar cellular responses
-              </p>
+              <div className="hidden sm:block">
+                <p className="text-sm text-muted-foreground max-w-xs">
+                  Find drugs with similar cellular responses
+                </p>
+                <p className="text-xs text-muted-foreground/70 mt-1">
+                  Target cell line: <span className="font-medium text-primary">A549</span> (human lung carcinoma)
+                </p>
+              </div>
             </div>
           </header>
 
