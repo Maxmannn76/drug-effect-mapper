@@ -116,10 +116,8 @@ export const ChatBot = ({ selectedDrug, similarDrugs, allDrugs, threshold }: Cha
       const { error } = await supabase.from("chat_messages").delete().neq("id", "00000000-0000-0000-0000-000000000000");
       if (error) throw error;
       setMessages([WELCOME_MESSAGE]);
-      toast.success("Chat history cleared");
     } catch (error) {
       console.error("Error clearing history:", error);
-      toast.error("Failed to clear history");
     }
   };
 
