@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, Bot, Trash2 } from "lucide-react";
+import { Send, Lightbulb, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Drug, DrugSimilarity } from "@/types/drug";
@@ -277,7 +277,7 @@ export const ChatBot = ({ selectedDrug, similarDrugs, allDrugs, threshold }: Cha
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-              <Bot className="h-3.5 w-3.5 text-primary-foreground" />
+              <Lightbulb className="h-3.5 w-3.5 text-primary-foreground" />
             </div>
             <div>
               <h3 className="text-sm font-semibold">Ask Elix</h3>
