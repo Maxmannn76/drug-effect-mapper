@@ -67,34 +67,9 @@ export const ChatBot = ({ selectedDrug, similarDrugs, allDrugs, threshold }: Cha
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Load chat history on mount
+  // Start with empty history each session
   useEffect(() => {
-    const loadHistory = async () => {
-      try {
-        const { data, error } = await supabase
-          .from("chat_messages")
-          .select("*")
-          .order("created_at", { ascending: true });
-
-        if (error) throw error;
-
-        if (data && data.length > 0) {
-          const loadedMessages: Message[] = data.map((msg) => ({
-            id: msg.id,
-            role: msg.role as "user" | "assistant",
-            content: msg.content,
-            timestamp: new Date(msg.created_at),
-          }));
-          setMessages([WELCOME_MESSAGE, ...loadedMessages]);
-        }
-      } catch (error) {
-        console.error("Error loading chat history:", error);
-      } finally {
-        setIsLoadingHistory(false);
-      }
-    };
-
-    loadHistory();
+    setIsLoadingHistory(false);
   }, []);
 
   useEffect(() => {
