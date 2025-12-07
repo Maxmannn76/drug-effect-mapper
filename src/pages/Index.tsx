@@ -22,12 +22,20 @@ const Index = () => {
   
   const api = useApiConnection();
 
-  // Load drugs list
+  // Load drugs list and select a random drug on initial load
   useEffect(() => {
     const loadDrugs = async () => {
       try {
         const data = await api.fetchDrugs();
         setDrugs(data);
+        
+        // Select a random drug on initial load if none selected
+        if (data.length > 0 && !selectedDrug) {
+          const randomIndex = Math.floor(Math.random() * data.length);
+          const randomDrug = data[randomIndex];
+          setSelectedDrug(randomDrug);
+          setSelectedNodeId(randomDrug.id);
+        }
       } catch (err) {
         console.error("Failed to load drugs:", err);
       }
