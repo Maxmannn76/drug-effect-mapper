@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { NetworkData, Drug, DrugSimilarity } from "@/types/drug";
 
-const API_URL = "https://35d0242f8dc9.ngrok-free.app";
+const API_URL = "https://cell-intelligence-production.up.railway.app";
 
 interface ApiState {
   isConnected: boolean;
