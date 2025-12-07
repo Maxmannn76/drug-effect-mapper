@@ -22,19 +22,18 @@ const Index = () => {
   
   const api = useApiConnection();
 
-  // Load drugs list and select a random drug on initial load
+  // Load drugs list and select 5-fluorouracil by default
   useEffect(() => {
     const loadDrugs = async () => {
       try {
         const data = await api.fetchDrugs();
         setDrugs(data);
         
-        // Select a random drug on initial load if none selected
+        // Select 5-fluorouracil by default if none selected
         if (data.length > 0 && !selectedDrug) {
-          const randomIndex = Math.floor(Math.random() * data.length);
-          const randomDrug = data[randomIndex];
-          setSelectedDrug(randomDrug);
-          setSelectedNodeId(randomDrug.id);
+          const defaultDrug = data.find(d => d.drug.toLowerCase() === '5-fluorouracil') || data[0];
+          setSelectedDrug(defaultDrug);
+          setSelectedNodeId(defaultDrug.id);
         }
       } catch (err) {
         console.error("Failed to load drugs:", err);
